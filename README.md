@@ -13,6 +13,7 @@ A lightweight client-side web app for building and previewing prompt templates f
 - Reorder sections via drag and drop.
 - Animated interactions with feedback when copying the rendered prompt.
 - Displays estimated token count for the rendered prompt.
+- Built-in starter templates for code assistants and document extraction.
 - Separate settings page to manage preferences.
 
 ## Usage
