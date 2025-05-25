@@ -4,9 +4,9 @@ A lightweight client-side web app for building and previewing prompt templates f
 
 ## Features
 
-- Write prompt templates with placeholders like `{{user}}`, `{user}`, or `$user`.
-- Define test values that automatically render into the template as you type.
-- Preview the rendered output in three formats: plain text, Python string, and JSON-safe string.
+- Create any number of prompt sections with customizable tag syntax.
+- Manage replacement values in a dynamic key/value list.
+- Render the final prompt live with Markdown formatting.
 - Dark mode layout built with Tailwind CSS and Alpine.js.
 
 ## Usage

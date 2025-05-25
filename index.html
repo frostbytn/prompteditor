@@ -6,86 +6,82 @@
   <title>Prompt Template Studio</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body class="bg-gray-900 text-white h-full flex items-center justify-center p-4">
   <div x-data="promptStudio()" class="w-full max-w-3xl bg-gray-800 rounded-lg shadow-lg p-6 space-y-6">
     <h1 class="text-2xl font-bold text-center">Prompt Template Studio</h1>
 
-    <!-- Template Input -->
+    <!-- Prompt Sections -->
     <div>
-      <h2 class="font-semibold mb-2">Prompt Template</h2>
-      <textarea x-model="template" @input="updateVars" rows="5" class="w-full p-2 bg-gray-900 rounded focus:outline-none"></textarea>
-    </div>
-
-    <!-- Test Values -->
-    <div>
-      <h2 class="font-semibold mb-2">Test Values</h2>
-      <template x-for="(val, name) in vars" :key="name">
-        <div class="flex items-center mb-2 space-x-2">
-          <label class="w-24 text-gray-400" x-text="name"></label>
-          <input type="text" x-model="vars[name]" class="flex-1 p-1 bg-gray-900 rounded focus:outline-none">
+      <template x-for="(section, idx) in sections" :key="idx">
+        <div class="mb-4 p-3 bg-gray-700 rounded space-y-2">
+          <div class="flex space-x-2">
+            <input x-model="section.name" placeholder="Name" class="w-1/4 p-1 bg-gray-900 rounded focus:outline-none">
+            <input x-model="section.startTag" placeholder="Start tag" class="w-1/4 p-1 bg-gray-900 rounded focus:outline-none">
+            <input x-model="section.endTag" placeholder="End tag" class="w-1/4 p-1 bg-gray-900 rounded focus:outline-none">
+            <button @click="removeSection(idx)" class="px-2 bg-red-600 rounded">Remove</button>
+          </div>
+          <textarea x-model="section.content" rows="3" class="w-full p-2 bg-gray-900 rounded focus:outline-none" placeholder="Section content"></textarea>
         </div>
       </template>
+      <button @click="addSection" class="px-3 py-1 bg-blue-600 rounded">Add Section</button>
+    </div>
+
+    <!-- Key/Value Entries -->
+    <div>
+      <h2 class="font-semibold mb-2">Replacements</h2>
+      <template x-for="(entry, i) in entries" :key="i">
+        <div class="flex items-center mb-2 space-x-2">
+          <input type="text" x-model="entry.key" placeholder="Key" class="w-1/3 p-1 bg-gray-900 rounded focus:outline-none">
+          <input type="text" x-model="entry.value" placeholder="Value" class="flex-1 p-1 bg-gray-900 rounded focus:outline-none">
+          <button @click="removeEntry(i)" class="px-2 bg-red-600 rounded">Remove</button>
+        </div>
+      </template>
+      <button @click="addEntry" class="px-3 py-1 bg-blue-600 rounded">Add Entry</button>
     </div>
 
     <!-- Live Render Output -->
     <div>
       <h2 class="font-semibold mb-2">Live Render</h2>
-      <div class="bg-gray-900 rounded p-3 min-h-[4rem]">
-        <pre class="whitespace-pre-wrap" x-text="rendered()"></pre>
-      </div>
-    </div>
-
-    <!-- Output Modes -->
-    <div>
-      <h2 class="font-semibold mb-2">Output Preview</h2>
-      <div class="flex space-x-2 mb-2">
-        <button @click="activeTab='plain'" :class="tabClass('plain')">Plain</button>
-        <button @click="activeTab='python'" :class="tabClass('python')">Python</button>
-        <button @click="activeTab='json'" :class="tabClass('json')">JSON</button>
-      </div>
-      <div class="bg-gray-900 rounded p-3">
-        <pre class="whitespace-pre-wrap" x-show="activeTab==='plain'" x-text="rendered()"></pre>
-        <pre class="whitespace-pre-wrap" x-show="activeTab==='python'" x-text="pythonString()"></pre>
-        <pre class="whitespace-pre-wrap" x-show="activeTab==='json'" x-text="jsonString()"></pre>
-      </div>
+      <div class="bg-gray-900 rounded p-3 min-h-[4rem] prose max-w-none" x-html="markdownRendered()"></div>
     </div>
   </div>
 
   <script>
-  function parseVars(t){
-    const re=/{{\s*(\w+)\s*}}|{\s*(\w+)\s*}|\$(\w+)/g;
-    const vars=new Set();
-    let m;
-    while((m=re.exec(t))){
-      vars.add(m[1]||m[2]||m[3]);
-    }
-    return Array.from(vars);
-  }
   function promptStudio(){
     return {
-      template:'You are chatting with {{user}} about {{topic}}.',
-      vars:{user:'Adrian',topic:'AI'},
-      activeTab:'plain',
-      init(){this.updateVars();},
-      updateVars(){
-        const names=parseVars(this.template);
-        const current={...this.vars};
-        this.vars={};
-        names.forEach(n=>{this.vars[n]=current[n]||''});
+      sections:[
+        {name:'MAIN', startTag:'', endTag:'', content:'You are chatting with {{user}} about {{topic}}.'}
+      ],
+      entries:[
+        {key:'user', value:'Adrian'},
+        {key:'topic', value:'AI'}
+      ],
+      addSection(){
+        this.sections.push({name:'SECTION', startTag:'[SECTION]', endTag:'[/SECTION]', content:''});
+      },
+      removeSection(i){
+        this.sections.splice(i,1);
+      },
+      addEntry(){
+        this.entries.push({key:'', value:''});
+      },
+      removeEntry(i){
+        this.entries.splice(i,1);
       },
       rendered(){
-        let out=this.template;
-        for(const [k,v] of Object.entries(this.vars)){
-          const re=new RegExp(`{{\\s*${k}\\s*}}|{\\s*${k}\\s*}|\\$${k}`,'g');
-          out=out.replace(re,v);
+        const template=this.sections.map(s=>`${s.startTag}\n${s.content}\n${s.endTag}`.trim()).join('\n');
+        let out=template;
+        for(const {key,value} of this.entries){
+          if(!key) continue;
+          const re=new RegExp(`{{\\s*${key}\\s*}}|{\\s*${key}\\s*}|\\$${key}`,'g');
+          out=out.replace(re,value);
         }
         return out;
       },
-      pythonString(){return JSON.stringify(this.rendered());},
-      jsonString(){return JSON.stringify(this.rendered());},
-      tabClass(t){
-        return this.activeTab===t?'px-3 py-1 bg-blue-600 rounded':'px-3 py-1 bg-gray-700 rounded';
+      markdownRendered(){
+        return marked.parse(this.rendered());
       }
     }
   }
