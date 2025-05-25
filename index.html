@@ -6,9 +6,10 @@
   <title>promptbin</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 </head>
-<body class="bg-gray-900 text-white h-full p-4">
-  <div x-data="promptStudio()" class="w-full max-w-5xl mx-auto bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col md:flex-row gap-6">
+<body class="bg-gray-950 text-white h-full p-4">
+  <div x-data="promptStudio()" class="w-full max-w-5xl mx-auto bg-gray-900 rounded-lg shadow-lg p-6 flex flex-col md:flex-row gap-6">
     <div class="flex-1 space-y-6">
     <h1 class="text-2xl font-bold text-center">promptbin</h1>
 
@@ -17,7 +18,7 @@
       <h2 class="font-semibold mb-2">Saved Prompts</h2>
       <div class="flex mb-2 space-x-2">
         <input type="text" x-model="saveName" placeholder="Prompt name" class="flex-1 p-1 bg-gray-900 rounded focus:outline-none">
-        <button @click="savePrompt" class="px-2 bg-green-600 rounded">Save</button>
+        <button @click="savePrompt" class="px-2 bg-gray-700 rounded" aria-label="Save"><i class="fa-solid fa-floppy-disk"></i></button>
       </div>
       <div class="flex mb-2 space-x-2">
         <select x-model="selectedPrompt" @change="loadPrompt(selectedPrompt)" class="flex-1 p-1 bg-gray-900 rounded focus:outline-none">
@@ -26,23 +27,23 @@
             <option :value="name" x-text="name"></option>
           </template>
         </select>
-        <button @click="deletePrompt(selectedPrompt)" :disabled="!selectedPrompt" class="px-2 bg-red-600 rounded">Delete</button>
+        <button @click="deletePrompt(selectedPrompt)" :disabled="!selectedPrompt" class="px-2 bg-gray-700 rounded" aria-label="Delete"><i class="fa-solid fa-trash"></i></button>
       </div>
     </div>
 
     <!-- Prompt Sections -->
     <div>
         <template x-for="(section, idx) in sections" :key="idx">
-          <div class="mb-4 p-3 bg-gray-700 rounded space-y-2 transition-all" x-transition>
+          <div class="mb-4 p-3 bg-gray-800 rounded space-y-2 transition-all" x-transition>
             <div class="flex space-x-2">
               <input x-model="section.startTag" @input="syncEndTag(section)" placeholder="Begin tag" class="w-1/3 p-1 bg-gray-900 rounded focus:outline-none">
               <input x-model="section.endTag" placeholder="End tag" class="w-1/3 p-1 bg-gray-900 rounded focus:outline-none">
-              <button @click="removeSection(idx)" class="px-2 bg-red-600 rounded">Remove</button>
+              <button @click="removeSection(idx)" class="px-2 bg-gray-700 rounded" aria-label="Remove section"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <textarea x-model="section.content" rows="3" class="w-full p-2 bg-gray-900 rounded focus:outline-none" placeholder="Section content"></textarea>
           </div>
         </template>
-        <button @click="addSection" class="px-3 py-1 bg-blue-600 rounded">Add Section</button>
+        <button @click="addSection" class="px-3 py-1 bg-gray-700 rounded" aria-label="Add section"><i class="fa-solid fa-plus"></i></button>
       </div>
 
     <!-- Key/Value Entries -->
@@ -52,10 +53,10 @@
           <div class="flex items-center mb-2 space-x-2 transition-all" x-transition>
             <input type="text" x-model="entry.key" placeholder="Key" class="w-1/3 p-1 bg-gray-900 rounded focus:outline-none">
             <input type="text" x-model="entry.value" placeholder="Value" class="flex-1 p-1 bg-gray-900 rounded focus:outline-none">
-            <button @click="removeEntry(i)" class="px-2 bg-red-600 rounded">Remove</button>
+            <button @click="removeEntry(i)" class="px-2 bg-gray-700 rounded" aria-label="Remove entry"><i class="fa-solid fa-xmark"></i></button>
           </div>
         </template>
-        <button @click="addEntry" class="px-3 py-1 bg-blue-600 rounded">Add Entry</button>
+        <button @click="addEntry" class="px-3 py-1 bg-gray-700 rounded" aria-label="Add entry"><i class="fa-solid fa-plus"></i></button>
       </div>
 
 
@@ -64,7 +65,7 @@
     <div class="flex-1">
       <div class="flex items-center justify-between mb-2">
         <h2 class="font-semibold">Live Render</h2>
-        <button @click="copyRender" class="px-2 bg-blue-600 rounded">Copy</button>
+        <button @click="copyRender" class="px-2 bg-gray-700 rounded" aria-label="Copy"><i class="fa-solid fa-copy"></i></button>
       </div>
       <div class="bg-gray-900 rounded p-3 min-h-[4rem] max-w-none" x-html="markdownRendered()"></div>
     </div>
