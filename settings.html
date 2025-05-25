@@ -11,14 +11,14 @@
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 </head>
-<body :class="theme === 'light' ? 'bg-gray-100 text-black' : 'bg-gray-950 text-white'" class="h-full p-4 flex flex-col" >
-  <header class="mb-4 p-2 rounded flex items-center justify-between bg-gray-900 text-white" :class="theme === 'light' ? 'bg-white text-black' : 'bg-gray-900 text-white'">
+<body :class="theme === 'light' ? 'bg-neutral-100 text-black' : 'bg-neutral-950 text-white'" class="h-full p-4 flex flex-col transition-colors duration-300" >
+  <header class="mb-4 p-2 rounded flex items-center justify-between bg-neutral-900 text-white transition-colors" :class="theme === 'light' ? 'bg-white text-black' : 'bg-neutral-900 text-white'">
     <h1 class="font-bold">promptbin</h1>
     <nav>
       <a href="index.html" class="p-2" aria-label="Home"><i class="fa-solid fa-house"></i></a>
     </nav>
   </header>
-  <div class="bg-gray-900 rounded-lg shadow-lg p-6 w-60 mx-auto" :class="theme === 'light' ? 'bg-white text-black' : 'bg-gray-900 text-white'">
+  <div class="bg-neutral-900 rounded-lg shadow-lg p-6 w-60 mx-auto transition-colors" :class="theme === 'light' ? 'bg-white text-black' : 'bg-neutral-900 text-white'">
     <h1 class="text-xl font-bold mb-4 text-center">Settings</h1>
     <label class="flex items-center space-x-2 mb-4">
       <input type="checkbox" @change="toggleTheme()" :checked="theme === 'light'">
