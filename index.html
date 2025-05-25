@@ -4,16 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>promptbin</title>
+  <script>
+    // Apply stored theme before styles load to avoid flashing
+    document.documentElement.classList.add(localStorage.getItem('theme') || 'dark');
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 </head>
-<body :class="theme === 'light' ? 'bg-gray-100 text-black' : 'bg-gray-950 text-white'" class="h-full p-4">
-  <a href="settings.html" class="absolute top-2 right-2 underline text-sm">Settings</a>
-  <div x-data="promptStudio()" x-init="init()" class="w-full max-w-5xl mx-auto rounded-lg shadow-lg p-6 flex flex-col md:flex-row gap-6" :class="theme === 'light' ? 'bg-white text-black' : 'bg-gray-900 text-white'">
+<body x-data="promptStudio()" x-init="init()" :class="theme === 'light' ? 'bg-gray-100 text-black' : 'bg-gray-950 text-white'" class="h-full p-4">
+  <header class="mb-4 p-2 rounded flex items-center justify-between bg-gray-900 text-white" :class="theme === 'light' ? 'bg-white text-black' : 'bg-gray-900 text-white'">
+    <h1 class="font-bold">promptbin</h1>
+    <nav>
+      <a href="settings.html" class="p-2" aria-label="Settings"><i class="fa-solid fa-gear"></i></a>
+    </nav>
+  </header>
+  <div class="w-full max-w-5xl mx-auto rounded-lg shadow-lg p-6 flex flex-col md:flex-row gap-6" :class="theme === 'light' ? 'bg-white text-black' : 'bg-gray-900 text-white'">
     <div class="flex-1 space-y-6">
-    <h1 class="text-2xl font-bold text-center">promptbin</h1>
 
     <!-- Saved Prompts -->
     <div>
@@ -191,6 +199,10 @@
         this.sortable = new Sortable(this.$refs.sectionsContainer, {
           handle: '.drag-handle',
           animation: 150,
+          delay: 50,
+          delayOnTouchOnly: true,
+          touchStartThreshold: 5,
+          fallbackOnBody: true,
           onEnd: evt => {
             const moved = this.sections.splice(evt.oldIndex, 1)[0];
             this.sections.splice(evt.newIndex, 0, moved);
