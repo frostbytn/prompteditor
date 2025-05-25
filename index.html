@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full dark">
+<html lang="en" class="h-full">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>promptbin</title>
-  <link href="dist/output.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-gray-900 text-gray-100 h-full p-4">
+<body class="bg-gray-900 text-white h-full p-4">
   <div x-data="promptStudio()" class="w-full max-w-5xl mx-auto bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col md:flex-row gap-6">
     <div class="flex-1 space-y-6">
     <h1 class="text-2xl font-bold text-center">promptbin</h1>
@@ -17,12 +17,7 @@
       <h2 class="font-semibold mb-2">Saved Prompts</h2>
       <div class="flex mb-2 space-x-2">
         <input type="text" x-model="saveName" placeholder="Prompt name" class="flex-1 p-1 bg-gray-900 rounded focus:outline-none">
-        <icon-button title="Save prompt" @click="savePrompt" class="text-accent">
-          <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V7l-4-4H5z"/>
-            <path d="M9 12v3h2v-3h3l-4-4-4 4h3z" fill="currentColor"/>
-          </svg>
-        </icon-button>
+        <button @click="savePrompt" class="px-2 bg-green-600 rounded">Save</button>
       </div>
       <div class="flex mb-2 space-x-2">
         <select x-model="selectedPrompt" @change="loadPrompt(selectedPrompt)" class="flex-1 p-1 bg-gray-900 rounded focus:outline-none">
@@ -31,11 +26,7 @@
             <option :value="name" x-text="name"></option>
           </template>
         </select>
-        <icon-button title="Delete prompt" @click="deletePrompt(selectedPrompt)" :disabled="!selectedPrompt" class="text-red-500">
-          <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg" stroke-width="2">
-            <path d="M6 6l8 8M6 14L14 6" stroke-linecap="round"/>
-          </svg>
-        </icon-button>
+        <button @click="deletePrompt(selectedPrompt)" :disabled="!selectedPrompt" class="px-2 bg-red-600 rounded">Delete</button>
       </div>
     </div>
 
@@ -46,20 +37,12 @@
             <div class="flex space-x-2">
               <input x-model="section.startTag" @input="syncEndTag(section)" placeholder="Begin tag" class="w-1/3 p-1 bg-gray-900 rounded focus:outline-none">
               <input x-model="section.endTag" placeholder="End tag" class="w-1/3 p-1 bg-gray-900 rounded focus:outline-none">
-              <icon-button title="Remove section" @click="removeSection(idx)" class="text-red-500">
-                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg" stroke-width="2">
-                  <path d="M5 10h10" stroke-linecap="round"/>
-                </svg>
-              </icon-button>
+              <button @click="removeSection(idx)" class="px-2 bg-red-600 rounded">Remove</button>
             </div>
             <textarea x-model="section.content" rows="3" class="w-full p-2 bg-gray-900 rounded focus:outline-none" placeholder="Section content"></textarea>
           </div>
         </template>
-        <icon-button title="Add section" @click="addSection" class="text-accent">
-          <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg" stroke-width="2">
-            <path d="M10 5v10M5 10h10" stroke-linecap="round"/>
-          </svg>
-        </icon-button>
+        <button @click="addSection" class="px-3 py-1 bg-blue-600 rounded">Add Section</button>
       </div>
 
     <!-- Key/Value Entries -->
@@ -69,18 +52,10 @@
           <div class="flex items-center mb-2 space-x-2 transition-all" x-transition>
             <input type="text" x-model="entry.key" placeholder="Key" class="w-1/3 p-1 bg-gray-900 rounded focus:outline-none">
             <input type="text" x-model="entry.value" placeholder="Value" class="flex-1 p-1 bg-gray-900 rounded focus:outline-none">
-            <icon-button title="Remove entry" @click="removeEntry(i)" class="text-red-500">
-              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg" stroke-width="2">
-                <path d="M5 10h10" stroke-linecap="round"/>
-              </svg>
-            </icon-button>
+            <button @click="removeEntry(i)" class="px-2 bg-red-600 rounded">Remove</button>
           </div>
         </template>
-        <icon-button title="Add entry" @click="addEntry" class="text-accent">
-          <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg" stroke-width="2">
-            <path d="M10 5v10M5 10h10" stroke-linecap="round"/>
-          </svg>
-        </icon-button>
+        <button @click="addEntry" class="px-3 py-1 bg-blue-600 rounded">Add Entry</button>
       </div>
 
 
@@ -89,12 +64,7 @@
     <div class="flex-1">
       <div class="flex items-center justify-between mb-2">
         <h2 class="font-semibold">Live Render</h2>
-        <icon-button title="Copy output" @click="copyRender" class="text-accent">
-          <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg" stroke-width="2">
-            <rect x="4" y="4" width="9" height="12" rx="2"/>
-            <path d="M7 4h8v12"/>
-          </svg>
-        </icon-button>
+        <button @click="copyRender" class="px-2 bg-blue-600 rounded">Copy</button>
       </div>
       <div class="bg-gray-900 rounded p-3 min-h-[4rem] max-w-none" x-html="markdownRendered()"></div>
     </div>
@@ -192,24 +162,6 @@
       }
     }
   }
-  </script>
-  <script>
-  class IconButton extends HTMLElement {
-    connectedCallback() {
-      const title = this.getAttribute('title') || '';
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'p-2 rounded hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-accent';
-      for (const attr of Array.from(this.attributes)) {
-        if (attr.name === 'title') continue;
-        button.setAttribute(attr.name, attr.value);
-      }
-      button.innerHTML = this.innerHTML + (title ? `<span class="sr-only">${title}</span>` : '');
-      if (title) button.title = title;
-      this.replaceChildren(button);
-    }
-  }
-  customElements.define('icon-button', IconButton);
   </script>
 </body>
 </html>

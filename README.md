@@ -11,6 +11,6 @@ A lightweight client-side web app for building and previewing prompt templates f
 
 ## Usage
 
-Run `npm run build` to generate `dist/output.css`, then open `index.html` in a browser. The site is entirely static and can be hosted on GitHub Pages.
+Open `index.html` in a browser. No build step or server is required.
 
 Feel free to customize the default template and styling.
