@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prompt Template Studio</title>
+  <title>promptbin</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="bg-gray-900 text-white h-full p-4">
   <div x-data="promptStudio()" class="w-full max-w-5xl mx-auto bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col md:flex-row gap-6">
     <div class="flex-1 space-y-6">
-    <h1 class="text-2xl font-bold text-center">Prompt Template Studio</h1>
+    <h1 class="text-2xl font-bold text-center">promptbin</h1>
 
     <!-- Saved Prompts -->
     <div>
@@ -78,11 +78,11 @@
   function promptStudio(){
     return {
       sections:[
-        {startTag:'', endTag:'', autoEndTag:'', content:'You are chatting with {{user}} about {{topic}}.'}
+        {startTag:'[system]', endTag:'[/system]', autoEndTag:'[/system]', content:'You are a helpful {{name}} with extensive knowledge in {{industry}}.'}
       ],
       entries:[
-        {key:'user', value:'Adrian'},
-        {key:'topic', value:'AI'}
+        {key:'name', value:'bot'},
+        {key:'industry', value:'forestry'}
       ],
       savedPrompts:{},
       saveName:'',
@@ -91,7 +91,11 @@
         this.loadSaved();
       },
       addSection(){
-        this.sections.push({startTag:'[SECTION]', endTag:'[/SECTION]', autoEndTag:'[/SECTION]', content:''});
+        if(this.sections.length === 0){
+          this.sections.push({startTag:'[system]', endTag:'[/system]', autoEndTag:'[/system]', content:'You are a helpful {{name}} with extensive knowledge in {{industry}}.'});
+        } else {
+          this.sections.push({startTag:'[SECTION]', endTag:'[/SECTION]', autoEndTag:'[/SECTION]', content:''});
+        }
       },
       removeSection(i){
         this.sections.splice(i,1);
