@@ -43,7 +43,12 @@
             <textarea x-model="section.content" rows="3" class="w-full p-2 bg-gray-900 rounded focus:outline-none" placeholder="Section content"></textarea>
           </div>
         </template>
-        <button @click="addSection" class="px-3 py-1 bg-gray-700 rounded" aria-label="Add section"><i class="fa-solid fa-plus"></i></button>
+        <div class="flex flex-wrap gap-2 mb-2">
+          <template x-for="(tpl, name) in sectionTemplates" :key="name">
+            <button @click="addSection(name)" class="px-2 py-1 bg-gray-700 rounded text-xs capitalize" x-text="name"></button>
+          </template>
+          <button @click="addSection()" class="px-2 py-1 bg-gray-700 rounded" aria-label="Add custom section"><i class="fa-solid fa-plus"></i></button>
+        </div>
       </div>
 
     <!-- Key/Value Entries -->
@@ -78,6 +83,12 @@
   }
   function promptStudio(){
     return {
+      sectionTemplates:{
+        system:{startTag:'[system]', endTag:'[/system]', autoEndTag:'[/system]', content:'You are a helpful {{name}} with extensive knowledge in {{industry}}.'},
+        example:{startTag:'[example]', endTag:'[/example]', autoEndTag:'[/example]', content:'Example content.'},
+        task:{startTag:'[task]', endTag:'[/task]', autoEndTag:'[/task]', content:'Describe the task here.'},
+        implementation:{startTag:'[implementation]', endTag:'[/implementation]', autoEndTag:'[/implementation]', content:'Implementation details.'}
+      },
       sections:[
         {startTag:'[system]', endTag:'[/system]', autoEndTag:'[/system]', content:'You are a helpful {{name}} with extensive knowledge in {{industry}}.'}
       ],
@@ -91,9 +102,13 @@
       init(){
         this.loadSaved();
       },
-      addSection(){
+      addSection(type){
+        if(type && this.sectionTemplates[type]){
+          this.sections.push(JSON.parse(JSON.stringify(this.sectionTemplates[type])));
+          return;
+        }
         if(this.sections.length === 0){
-          this.sections.push({startTag:'[system]', endTag:'[/system]', autoEndTag:'[/system]', content:'You are a helpful {{name}} with extensive knowledge in {{industry}}.'});
+          this.sections.push(JSON.parse(JSON.stringify(this.sectionTemplates.system)));
         } else {
           this.sections.push({startTag:'[SECTION]', endTag:'[/SECTION]', autoEndTag:'[/SECTION]', content:''});
         }
