@@ -13,37 +13,37 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 </head>
-<body x-data="promptStudio()" x-init="init()" :class="theme === 'light' ? 'bg-gray-100 text-black' : 'bg-gray-950 text-white'" class="h-full p-4">
-  <header class="mb-4 p-2 rounded flex items-center justify-between bg-gray-900 text-white" :class="theme === 'light' ? 'bg-white text-black' : 'bg-gray-900 text-white'">
+<body x-data="promptStudio()" x-init="init()" :class="theme === 'light' ? 'bg-neutral-100 text-black' : 'bg-neutral-950 text-white'" class="h-full p-4 transition-colors duration-300">
+  <header class="mb-4 p-2 rounded flex items-center justify-between bg-neutral-900 text-white transition-colors" :class="theme === 'light' ? 'bg-white text-black' : 'bg-neutral-900 text-white'">
     <h1 class="font-bold">promptbin</h1>
     <nav>
       <a href="settings.html" class="p-2" aria-label="Settings"><i class="fa-solid fa-gear"></i></a>
     </nav>
   </header>
-  <div class="w-full max-w-5xl mx-auto rounded-lg shadow-lg p-6 flex flex-col md:flex-row gap-6" :class="theme === 'light' ? 'bg-white text-black' : 'bg-gray-900 text-white'">
+  <div class="w-full max-w-5xl mx-auto rounded-lg shadow-lg p-6 flex flex-col md:flex-row gap-6 transition-colors" :class="theme === 'light' ? 'bg-white text-black' : 'bg-neutral-900 text-white'">
     <div class="flex-1 space-y-6">
 
     <!-- Saved Prompts -->
     <div>
       <h2 class="font-semibold mb-2">Saved Prompts</h2>
       <div class="flex mb-2 space-x-2">
-        <select x-model="selectedPrompt" @change="loadPrompt(selectedPrompt)" class="flex-1 p-1 bg-gray-900 rounded focus:outline-none" :class="theme === 'light' ? 'bg-gray-200 text-black' : 'bg-gray-900'">
+        <select x-model="selectedPrompt" @change="loadPrompt(selectedPrompt)" class="flex-1 p-1 bg-neutral-900 rounded focus:outline-none" :class="theme === 'light' ? 'bg-neutral-200 text-black' : 'bg-neutral-900'">
           <option value="" disabled selected>Select prompt</option>
           <template x-for="(prompt, name) in savedPrompts" :key="name">
             <option :value="name" x-text="name"></option>
           </template>
         </select>
-        <button @click="promptSave" class="px-2 bg-gray-700 rounded" :class="theme === 'light' ? 'bg-gray-300 text-black' : 'bg-gray-700'" aria-label="Save"><i class="fa-solid fa-floppy-disk"></i></button>
-        <button @click="deletePrompt(selectedPrompt)" :disabled="!selectedPrompt" class="px-2 bg-gray-700 rounded" :class="theme === 'light' ? 'bg-gray-300 text-black' : 'bg-gray-700'" aria-label="Delete"><i class="fa-solid fa-trash"></i></button>
+        <button @click="promptSave" class="px-2 bg-neutral-700 rounded" :class="theme === 'light' ? 'bg-neutral-300 text-black' : 'bg-neutral-700'" aria-label="Save"><i class="fa-solid fa-floppy-disk"></i></button>
+        <button @click="deletePrompt(selectedPrompt)" :disabled="!selectedPrompt" class="px-2 bg-neutral-700 rounded" :class="theme === 'light' ? 'bg-neutral-300 text-black' : 'bg-neutral-700'" aria-label="Delete"><i class="fa-solid fa-trash"></i></button>
       </div>
       <!-- Save modal -->
-      <div x-show="showSaveModal" x-transition class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-gray-900 p-4 rounded space-y-2" :class="theme === 'light' ? 'bg-white text-black' : 'bg-gray-900 text-white'">
+      <div x-show="showSaveModal" x-transition.opacity.duration.200 class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-neutral-900 p-4 rounded space-y-2" :class="theme === 'light' ? 'bg-white text-black' : 'bg-neutral-900 text-white'">
           <h2 class="font-semibold">Save Prompt</h2>
-          <input type="text" x-model="saveName" placeholder="Prompt name" class="w-full p-1 bg-gray-900 rounded focus:outline-none" :class="theme === 'light' ? 'bg-gray-200 text-black' : 'bg-gray-900'">
+          <input type="text" x-model="saveName" placeholder="Prompt name" class="w-full p-1 bg-neutral-900 rounded focus:outline-none" :class="theme === 'light' ? 'bg-neutral-200 text-black' : 'bg-neutral-900'">
           <div class="flex justify-end space-x-2">
-            <button @click="showSaveModal=false" class="px-2 bg-gray-700 rounded" :class="theme === 'light' ? 'bg-gray-300 text-black' : 'bg-gray-700'">Cancel</button>
-            <button @click="savePrompt" class="px-2 bg-gray-700 rounded" :class="theme === 'light' ? 'bg-gray-300 text-black' : 'bg-gray-700'">Save</button>
+            <button @click="showSaveModal=false" class="px-2 bg-neutral-700 rounded" :class="theme === 'light' ? 'bg-neutral-300 text-black' : 'bg-neutral-700'">Cancel</button>
+            <button @click="savePrompt" class="px-2 bg-neutral-700 rounded" :class="theme === 'light' ? 'bg-neutral-300 text-black' : 'bg-neutral-700'">Save</button>
           </div>
         </div>
       </div>
@@ -53,22 +53,22 @@
     <div>
         <div x-ref="sectionsContainer">
           <template x-for="(section, idx) in sections" :key="idx">
-            <div class="mb-4 p-3 bg-gray-800 rounded space-y-2 transition-all" x-transition.opacity.scale.duration.300 :class="theme === 'light' ? 'bg-gray-100 text-black' : 'bg-gray-800'">
+            <div class="mb-4 p-3 bg-neutral-800 rounded space-y-2 transition-all" x-transition.opacity.scale.duration.300 :class="theme === 'light' ? 'bg-neutral-100 text-black' : 'bg-neutral-800'">
               <div class="flex space-x-2 items-center">
-                <span class="cursor-move drag-handle text-gray-400"><i class="fa-solid fa-up-down-left-right"></i></span>
-                <input x-model="section.startTag" @input="syncEndTag(section)" placeholder="Begin tag" class="w-1/3 p-1 bg-gray-900 rounded focus:outline-none" :class="theme === 'light' ? 'bg-gray-200 text-black' : 'bg-gray-900'">
-                <input x-model="section.endTag" placeholder="End tag" class="w-1/3 p-1 bg-gray-900 rounded focus:outline-none" :class="theme === 'light' ? 'bg-gray-200 text-black' : 'bg-gray-900'">
-                <button @click="removeSection(idx)" class="px-2 bg-gray-700 rounded" :class="theme === 'light' ? 'bg-gray-300 text-black' : 'bg-gray-700'" aria-label="Remove section"><i class="fa-solid fa-xmark"></i></button>
+                <span class="cursor-move drag-handle text-neutral-400"><i class="fa-solid fa-up-down-left-right"></i></span>
+                <input x-model="section.startTag" @input="syncEndTag(section)" placeholder="Begin tag" class="w-1/3 p-1 bg-neutral-900 rounded focus:outline-none" :class="theme === 'light' ? 'bg-neutral-200 text-black' : 'bg-neutral-900'">
+                <input x-model="section.endTag" placeholder="End tag" class="w-1/3 p-1 bg-neutral-900 rounded focus:outline-none" :class="theme === 'light' ? 'bg-neutral-200 text-black' : 'bg-neutral-900'">
+                <button @click="removeSection(idx)" class="px-2 bg-neutral-700 rounded" :class="theme === 'light' ? 'bg-neutral-300 text-black' : 'bg-neutral-700'" aria-label="Remove section"><i class="fa-solid fa-xmark"></i></button>
               </div>
-              <textarea x-model="section.content" rows="3" class="w-full p-2 bg-gray-900 rounded focus:outline-none" placeholder="Section content" :class="theme === 'light' ? 'bg-gray-200 text-black' : 'bg-gray-900'"></textarea>
+              <textarea x-model="section.content" rows="3" class="w-full p-2 bg-neutral-900 rounded focus:outline-none" placeholder="Section content" :class="theme === 'light' ? 'bg-neutral-200 text-black' : 'bg-neutral-900'"></textarea>
             </div>
           </template>
         </div>
         <div class="flex flex-wrap gap-2 mb-2">
           <template x-for="(tpl, name) in sectionTemplates" :key="name">
-            <button @click="addSection(name)" class="px-2 py-1 bg-gray-700 rounded text-xs capitalize" :class="theme === 'light' ? 'bg-gray-300 text-black' : 'bg-gray-700'" x-text="name"></button>
+            <button @click="addSection(name)" class="px-2 py-1 bg-neutral-700 rounded text-xs capitalize" :class="theme === 'light' ? 'bg-neutral-300 text-black' : 'bg-neutral-700'" x-text="name"></button>
           </template>
-          <button @click="addSection()" class="px-2 py-1 bg-gray-700 rounded" :class="theme === 'light' ? 'bg-gray-300 text-black' : 'bg-gray-700'" aria-label="Add custom section"><i class="fa-solid fa-plus"></i></button>
+          <button @click="addSection()" class="px-2 py-1 bg-neutral-700 rounded" :class="theme === 'light' ? 'bg-neutral-300 text-black' : 'bg-neutral-700'" aria-label="Add custom section"><i class="fa-solid fa-plus"></i></button>
         </div>
       </div>
 
@@ -77,12 +77,12 @@
       <h2 class="font-semibold mb-2">Replacements</h2>
         <template x-for="(entry, i) in entries" :key="i">
           <div class="flex items-center mb-2 space-x-2 transition-all" x-transition.opacity.scale.duration.300>
-            <input type="text" x-model="entry.key" placeholder="Key" class="w-1/3 p-1 bg-gray-900 rounded focus:outline-none" :class="theme === 'light' ? 'bg-gray-200 text-black' : 'bg-gray-900'">
-            <input type="text" x-model="entry.value" placeholder="Value" class="flex-1 p-1 bg-gray-900 rounded focus:outline-none" :class="theme === 'light' ? 'bg-gray-200 text-black' : 'bg-gray-900'">
-            <button @click="removeEntry(i)" class="px-2 bg-gray-700 rounded" :class="theme === 'light' ? 'bg-gray-300 text-black' : 'bg-gray-700'" aria-label="Remove entry"><i class="fa-solid fa-xmark"></i></button>
+            <input type="text" x-model="entry.key" placeholder="Key" class="w-1/3 p-1 bg-neutral-900 rounded focus:outline-none" :class="theme === 'light' ? 'bg-neutral-200 text-black' : 'bg-neutral-900'">
+            <input type="text" x-model="entry.value" placeholder="Value" class="flex-1 p-1 bg-neutral-900 rounded focus:outline-none" :class="theme === 'light' ? 'bg-neutral-200 text-black' : 'bg-neutral-900'">
+            <button @click="removeEntry(i)" class="px-2 bg-neutral-700 rounded" :class="theme === 'light' ? 'bg-neutral-300 text-black' : 'bg-neutral-700'" aria-label="Remove entry"><i class="fa-solid fa-xmark"></i></button>
           </div>
         </template>
-        <button @click="addEntry" class="px-3 py-1 bg-gray-700 rounded" :class="theme === 'light' ? 'bg-gray-300 text-black' : 'bg-gray-700'" aria-label="Add entry"><i class="fa-solid fa-plus"></i></button>
+        <button @click="addEntry" class="px-3 py-1 bg-neutral-700 rounded" :class="theme === 'light' ? 'bg-neutral-300 text-black' : 'bg-neutral-700'" aria-label="Add entry"><i class="fa-solid fa-plus"></i></button>
       </div>
 
 
@@ -92,12 +92,12 @@
       <div class="flex items-center justify-between mb-2">
         <h2 class="font-semibold">Live Render</h2>
         <div class="flex items-center space-x-2">
-          <span class="text-xs text-gray-400" x-text="'Tokens: ' + tokenCount()"></span>
-          <button @click="copyRender" class="px-2 bg-gray-700 rounded" :class="theme === 'light' ? 'bg-gray-300 text-black' : 'bg-gray-700'" aria-label="Copy"><i class="fa-solid fa-copy"></i></button>
-          <span x-show="copied" x-transition class="text-green-400 text-xs ml-2">Copied!</span>
+          <span class="text-xs text-neutral-400" x-text="'Tokens: ' + tokenCount()"></span>
+          <button @click="copyRender" class="px-2 bg-neutral-700 rounded" :class="theme === 'light' ? 'bg-neutral-300 text-black' : 'bg-neutral-700'" aria-label="Copy"><i class="fa-solid fa-copy"></i></button>
+          <span x-show="copied" x-transition.opacity.scale.duration.300 class="text-green-400 text-xs ml-2">Copied!</span>
         </div>
       </div>
-      <div class="bg-gray-900 rounded p-3 min-h-[4rem] max-w-none" x-html="markdownRendered()" :class="theme === 'light' ? 'bg-gray-200 text-black' : 'bg-gray-900'"></div>
+      <div class="bg-neutral-900 rounded p-3 min-h-[4rem] max-w-none" x-html="markdownRendered()" :class="theme === 'light' ? 'bg-neutral-200 text-black' : 'bg-neutral-900'"></div>
     </div>
   </div>
 
