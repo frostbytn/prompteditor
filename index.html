@@ -83,7 +83,8 @@
     <div class="flex-1">
       <div class="flex items-center justify-between mb-2">
         <h2 class="font-semibold">Live Render</h2>
-        <div class="flex items-center">
+        <div class="flex items-center space-x-2">
+          <span class="text-xs text-gray-400" x-text="'Tokens: ' + tokenCount()"></span>
           <button @click="copyRender" class="px-2 bg-gray-700 rounded" aria-label="Copy"><i class="fa-solid fa-copy"></i></button>
           <span x-show="copied" x-transition class="text-green-400 text-xs ml-2">Copied!</span>
         </div>
@@ -162,6 +163,13 @@
       },
       markdownRendered(){
         return this.rendered().replace(/\n/g, "<br>");
+      },
+      estimateTokens(text){
+        if(!text) return 0;
+        return text.trim().split(/\s+/).filter(Boolean).length;
+      },
+      tokenCount(){
+        return this.estimateTokens(this.rendered());
       },
       loadSaved(){
         const data = localStorage.getItem('savedPrompts');

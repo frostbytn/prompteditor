@@ -12,6 +12,7 @@ A lightweight client-side web app for building and previewing prompt templates f
 - Icon-based buttons for a compact interface.
 - Reorder sections via drag and drop.
 - Animated interactions with feedback when copying the rendered prompt.
+- Displays estimated token count for the rendered prompt.
 - Separate settings page to manage preferences.
 
 ## Usage
