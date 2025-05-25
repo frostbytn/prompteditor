@@ -12,6 +12,24 @@
     <div class="flex-1 space-y-6">
     <h1 class="text-2xl font-bold text-center">Prompt Template Studio</h1>
 
+    <!-- Saved Prompts -->
+    <div>
+      <h2 class="font-semibold mb-2">Saved Prompts</h2>
+      <div class="flex mb-2 space-x-2">
+        <input type="text" x-model="saveName" placeholder="Prompt name" class="flex-1 p-1 bg-gray-900 rounded focus:outline-none">
+        <button @click="savePrompt" class="px-2 bg-green-600 rounded">Save</button>
+      </div>
+      <div class="flex mb-2 space-x-2">
+        <select x-model="selectedPrompt" @change="loadPrompt(selectedPrompt)" class="flex-1 p-1 bg-gray-900 rounded focus:outline-none">
+          <option value="" disabled selected>Select prompt</option>
+          <template x-for="(prompt, name) in savedPrompts" :key="name">
+            <option :value="name" x-text="name"></option>
+          </template>
+        </select>
+        <button @click="deletePrompt(selectedPrompt)" :disabled="!selectedPrompt" class="px-2 bg-red-600 rounded">Delete</button>
+      </div>
+    </div>
+
     <!-- Prompt Sections -->
     <div>
         <template x-for="(section, idx) in sections" :key="idx">
@@ -40,29 +58,14 @@
         <button @click="addEntry" class="px-3 py-1 bg-blue-600 rounded">Add Entry</button>
       </div>
 
-      <!-- Saved Prompts -->
-      <div>
-        <h2 class="font-semibold mb-2 mt-4">Saved Prompts</h2>
-        <div class="flex mb-2 space-x-2">
-          <input type="text" x-model="saveName" placeholder="Prompt name" class="flex-1 p-1 bg-gray-900 rounded focus:outline-none">
-          <button @click="savePrompt" class="px-2 bg-green-600 rounded">Save</button>
-        </div>
-        <div class="flex mb-2 space-x-2">
-          <select x-model="selectedPrompt" class="flex-1 p-1 bg-gray-900 rounded focus:outline-none">
-            <option value="" disabled selected>Select prompt</option>
-            <template x-for="(prompt, name) in savedPrompts" :key="name">
-              <option :value="name" x-text="name"></option>
-            </template>
-          </select>
-          <button @click="loadPrompt(selectedPrompt)" :disabled="!selectedPrompt" class="px-2 bg-blue-600 rounded">Load</button>
-          <button @click="deletePrompt(selectedPrompt)" :disabled="!selectedPrompt" class="px-2 bg-red-600 rounded">Delete</button>
-        </div>
-      </div>
 
     </div>
     <!-- Live Render Output -->
     <div class="flex-1">
-      <h2 class="font-semibold mb-2">Live Render</h2>
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="font-semibold">Live Render</h2>
+        <button @click="copyRender" class="px-2 bg-blue-600 rounded">Copy</button>
+      </div>
       <div class="bg-gray-900 rounded p-3 min-h-[4rem] max-w-none" x-html="markdownRendered()"></div>
     </div>
   </div>
@@ -144,6 +147,9 @@
           this.entries = JSON.parse(JSON.stringify(data.entries));
           this.selectedPrompt = name;
         }
+      },
+      copyRender(){
+        navigator.clipboard.writeText(this.rendered());
       },
       deletePrompt(name){
         delete this.savedPrompts[name];
