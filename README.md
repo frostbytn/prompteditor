@@ -1,4 +1,4 @@
-# Prompt Template Studio
+# promptbin
 
 A lightweight client-side web app for building and previewing prompt templates for large language models. It runs entirely in the browser and is suitable for hosting on GitHub Pages.
 
