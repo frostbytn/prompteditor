@@ -6,7 +6,6 @@
   <title>Prompt Template Studio</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body class="bg-gray-900 text-white h-full p-4">
   <div x-data="promptStudio()" class="w-full max-w-5xl mx-auto bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col md:flex-row gap-6">
@@ -48,19 +47,23 @@
           <input type="text" x-model="saveName" placeholder="Prompt name" class="flex-1 p-1 bg-gray-900 rounded focus:outline-none">
           <button @click="savePrompt" class="px-2 bg-green-600 rounded">Save</button>
         </div>
-        <template x-for="(prompt, name) in savedPrompts" :key="name">
-          <div class="flex items-center mb-1 space-x-2">
-            <button @click="loadPrompt(name)" class="flex-1 text-left underline text-blue-300 hover:text-blue-200">{{name}}</button>
-            <button @click="deletePrompt(name)" class="px-1 bg-red-600 rounded">X</button>
-          </div>
-        </template>
+        <div class="flex mb-2 space-x-2">
+          <select x-model="selectedPrompt" class="flex-1 p-1 bg-gray-900 rounded focus:outline-none">
+            <option value="" disabled selected>Select prompt</option>
+            <template x-for="(prompt, name) in savedPrompts" :key="name">
+              <option :value="name" x-text="name"></option>
+            </template>
+          </select>
+          <button @click="loadPrompt(selectedPrompt)" :disabled="!selectedPrompt" class="px-2 bg-blue-600 rounded">Load</button>
+          <button @click="deletePrompt(selectedPrompt)" :disabled="!selectedPrompt" class="px-2 bg-red-600 rounded">Delete</button>
+        </div>
       </div>
 
     </div>
     <!-- Live Render Output -->
     <div class="flex-1">
       <h2 class="font-semibold mb-2">Live Render</h2>
-      <div class="bg-gray-900 rounded p-3 min-h-[4rem] prose max-w-none" x-html="markdownRendered()"></div>
+      <div class="bg-gray-900 rounded p-3 min-h-[4rem] max-w-none" x-html="markdownRendered()"></div>
     </div>
   </div>
 
@@ -80,6 +83,7 @@
       ],
       savedPrompts:{},
       saveName:'',
+      selectedPrompt:'',
       init(){
         this.loadSaved();
       },
@@ -113,12 +117,12 @@
         return out;
       },
       markdownRendered(){
-        const text = this.rendered();
-        return window.marked ? marked.parse(text) : text.replace(/\n/g, "<br>");
+        return this.rendered().replace(/\n/g, "<br>");
       },
       loadSaved(){
         const data = localStorage.getItem('savedPrompts');
         this.savedPrompts = data ? JSON.parse(data) : {};
+        this.selectedPrompt = '';
       },
       persistSaved(){
         localStorage.setItem('savedPrompts', JSON.stringify(this.savedPrompts));
@@ -130,6 +134,7 @@
           entries: JSON.parse(JSON.stringify(this.entries))
         };
         this.persistSaved();
+        this.selectedPrompt = this.saveName;
         this.saveName = '';
       },
       loadPrompt(name){
@@ -137,11 +142,13 @@
         if(data){
           this.sections = JSON.parse(JSON.stringify(data.sections));
           this.entries = JSON.parse(JSON.stringify(data.entries));
+          this.selectedPrompt = name;
         }
       },
       deletePrompt(name){
         delete this.savedPrompts[name];
         this.persistSaved();
+        if(this.selectedPrompt === name) this.selectedPrompt = '';
       }
     }
   }

@@ -6,7 +6,7 @@ A lightweight client-side web app for building and previewing prompt templates f
 
 - Create any number of prompt sections with customizable tag syntax.
 - Manage replacement values in a dynamic key/value list.
-- Render the final prompt live with Markdown formatting.
+- Render the final prompt live as plain text.
 - Dark mode layout built with Tailwind CSS and Alpine.js.
 
 ## Usage
