@@ -49,6 +49,19 @@
       </div>
     </div>
 
+    <!-- Starter Templates -->
+    <div>
+      <h2 class="font-semibold mb-2">Starter Templates</h2>
+      <div class="flex mb-2 space-x-2">
+        <select x-model="selectedTemplate" @change="applyTemplate(selectedTemplate)" class="flex-1 p-1 bg-neutral-900 rounded focus:outline-none" :class="theme === 'light' ? 'bg-neutral-200 text-black' : 'bg-neutral-900'">
+          <option value="" disabled selected>Select template</option>
+          <template x-for="(tpl, name) in promptTemplates" :key="name">
+            <option :value="name" x-text="name"></option>
+          </template>
+        </select>
+      </div>
+    </div>
+
     <!-- Prompt Sections -->
     <div>
         <div x-ref="sectionsContainer">
@@ -114,6 +127,29 @@
         task:{startTag:'[task]', endTag:'[/task]', autoEndTag:'[/task]', content:'Describe the task here.'},
         implementation:{startTag:'[implementation]', endTag:'[/implementation]', autoEndTag:'[/implementation]', content:'Implementation details.'}
       },
+      promptTemplates:{
+        'Code Assistant':{
+          sections:[
+            {startTag:'[system]', endTag:'[/system]', autoEndTag:'[/system]', content:'You are a knowledgeable assistant that writes {{language}} code.'},
+            {startTag:'[example]', endTag:'[/example]', autoEndTag:'[/example]', content:'User: How do I use a loop?\nAssistant: Here is an example in {{language}}.'},
+            {startTag:'[task]', endTag:'[/task]', autoEndTag:'[/task]', content:'Provide {{language}} code for {{task}}.'}
+          ],
+          entries:[
+            {key:'language', value:'Python'},
+            {key:'task', value:'read a file'}
+          ]
+        },
+        'Document Extraction':{
+          sections:[
+            {startTag:'[system]', endTag:'[/system]', autoEndTag:'[/system]', content:'You extract structured data from documents.'},
+            {startTag:'[example]', endTag:'[/example]', autoEndTag:'[/example]', content:'Document: Invoice #123 from ACME on 2023-01-01\nOutput: {"invoice":"123","company":"ACME","date":"2023-01-01"}'},
+            {startTag:'[task]', endTag:'[/task]', autoEndTag:'[/task]', content:'Extract {{fields}} from the following document.'}
+          ],
+          entries:[
+            {key:'fields', value:'invoice, company, date'}
+          ]
+        }
+      },
       sections:[
         {startTag:'[system]', endTag:'[/system]', autoEndTag:'[/system]', content:'You are a helpful {{name}} with extensive knowledge in {{industry}}.'}
       ],
@@ -124,6 +160,7 @@
       savedPrompts:{},
       saveName:'',
       selectedPrompt:'',
+      selectedTemplate:'',
       showSaveModal:false,
       copied:false,
       theme: localStorage.getItem('theme') || 'dark',
@@ -209,6 +246,16 @@
           this.sections = JSON.parse(JSON.stringify(data.sections));
           this.entries = JSON.parse(JSON.stringify(data.entries));
           this.selectedPrompt = name;
+        }
+      },
+      applyTemplate(name){
+        const data = this.promptTemplates[name];
+        if(data){
+          this.sections = JSON.parse(JSON.stringify(data.sections));
+          this.entries = JSON.parse(JSON.stringify(data.entries));
+          this.selectedTemplate = name;
+          this.selectedPrompt = '';
+          this.$nextTick(() => this.initSortable());
         }
       },
       copyRender(){
