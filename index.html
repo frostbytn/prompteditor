@@ -41,6 +41,21 @@
         <button @click="addEntry" class="px-3 py-1 bg-blue-600 rounded">Add Entry</button>
       </div>
 
+      <!-- Saved Prompts -->
+      <div>
+        <h2 class="font-semibold mb-2 mt-4">Saved Prompts</h2>
+        <div class="flex mb-2 space-x-2">
+          <input type="text" x-model="saveName" placeholder="Prompt name" class="flex-1 p-1 bg-gray-900 rounded focus:outline-none">
+          <button @click="savePrompt" class="px-2 bg-green-600 rounded">Save</button>
+        </div>
+        <template x-for="(prompt, name) in savedPrompts" :key="name">
+          <div class="flex items-center mb-1 space-x-2">
+            <button @click="loadPrompt(name)" class="flex-1 text-left underline text-blue-300 hover:text-blue-200">{{name}}</button>
+            <button @click="deletePrompt(name)" class="px-1 bg-red-600 rounded">X</button>
+          </div>
+        </template>
+      </div>
+
     </div>
     <!-- Live Render Output -->
     <div class="flex-1">
@@ -63,6 +78,11 @@
         {key:'user', value:'Adrian'},
         {key:'topic', value:'AI'}
       ],
+      savedPrompts:{},
+      saveName:'',
+      init(){
+        this.loadSaved();
+      },
       addSection(){
         this.sections.push({startTag:'[SECTION]', endTag:'[/SECTION]', autoEndTag:'[/SECTION]', content:''});
       },
@@ -92,10 +112,37 @@
         }
         return out;
       },
-        markdownRendered(){
-          const text = this.rendered();
-          return window.marked ? marked.parse(text) : text.replace(/\n/g, "<br>");
+      markdownRendered(){
+        const text = this.rendered();
+        return window.marked ? marked.parse(text) : text.replace(/\n/g, "<br>");
+      },
+      loadSaved(){
+        const data = localStorage.getItem('savedPrompts');
+        this.savedPrompts = data ? JSON.parse(data) : {};
+      },
+      persistSaved(){
+        localStorage.setItem('savedPrompts', JSON.stringify(this.savedPrompts));
+      },
+      savePrompt(){
+        if(!this.saveName) return;
+        this.savedPrompts[this.saveName] = {
+          sections: JSON.parse(JSON.stringify(this.sections)),
+          entries: JSON.parse(JSON.stringify(this.entries))
+        };
+        this.persistSaved();
+        this.saveName = '';
+      },
+      loadPrompt(name){
+        const data = this.savedPrompts[name];
+        if(data){
+          this.sections = JSON.parse(JSON.stringify(data.sections));
+          this.entries = JSON.parse(JSON.stringify(data.entries));
         }
+      },
+      deletePrompt(name){
+        delete this.savedPrompts[name];
+        this.persistSaved();
+      }
     }
   }
   </script>
