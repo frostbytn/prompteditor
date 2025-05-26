@@ -209,6 +209,7 @@
       init(){
         this.loadSaved();
         this.applyTheme();
+        window.promptStudioApp = this;
         this.$nextTick(() => this.initSortable());
       },
       addSection(type){
@@ -342,9 +343,9 @@
         this.log('Initializing LLaMA context...');
         this.loadingMessage = 'Loading model...';
         try {
-          const { createLLamaContext } = await import('https://esm.sh/llama-cpp-wasm@0.1.2');
+          const { createLLamaContext } = await import('https://cdn.jsdelivr.net/npm/llama-cpp-wasm@0.1.2/+esm');
           this.llamaCtx = await createLLamaContext({
-            wasmURL: 'https://esm.sh/llama-cpp-wasm@0.1.2/llama-cpp.wasm',
+            wasmURL: 'https://cdn.jsdelivr.net/npm/llama-cpp-wasm@0.1.2/llama-cpp.wasm',
             modelURL: 'https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.q4_0.gguf',
             nThreads: navigator.hardwareConcurrency || 4
           });
@@ -415,6 +416,26 @@
       }
     }
   }
+  </script>
+  <script>
+    window.addEventListener('error', e => {
+      const app = window.promptStudioApp;
+      if(app && app.log){
+        app.log('Global error: ' + e.message);
+        if(e.error && e.error.stack){
+          app.log(e.error.stack);
+        }
+      }
+    });
+    window.addEventListener('unhandledrejection', e => {
+      const app = window.promptStudioApp;
+      if(app && app.log){
+        app.log('Unhandled rejection: ' + e.reason);
+        if(e.reason && e.reason.stack){
+          app.log(e.reason.stack);
+        }
+      }
+    });
   </script>
 </body>
 </html>
