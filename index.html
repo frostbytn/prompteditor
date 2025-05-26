@@ -350,19 +350,21 @@
         if(this.pipeline) return;
         this.log('Initializing pipeline...');
         this.loadingMessage = 'Loading model...';
+        const sources = [
+          'https://cdn.jsdelivr.net/npm/@xenova/transformers/dist/transformers.min.js',
+          'https://unpkg.com/@xenova/transformers/dist/transformers.min.js'
+        ];
         try {
           if(!window.transformers){
-            this.log('Loading transformers library...');
-            try {
-              await this.loadScript('https://cdn.jsdelivr.net/npm/@xenova/transformers/dist/transformers.min.js');
-            } catch(e){
-              this.log('CDN load failed, using local stub.');
-              await this.loadScript('transformers_stub.js');
+            for(const src of sources){
+              try {
+                this.log('Loading transformers library from ' + src + '...');
+                await this.loadScript(src);
+                if(window.transformers && window.transformers.pipeline) break;
+              } catch(e){
+                this.log('Failed to load from ' + src + ': ' + e);
+              }
             }
-          }
-          if(!window.transformers || !window.transformers.pipeline){
-            this.log('CDN library missing pipeline, using local stub.');
-            await this.loadScript('transformers_stub.js');
           }
           if(!window.transformers || !window.transformers.pipeline){
             throw new Error('Transformers library unavailable');
