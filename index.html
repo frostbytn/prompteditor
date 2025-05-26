@@ -35,6 +35,7 @@
         </select>
         <button @click="promptSave" class="px-2 bg-neutral-700 rounded" :class="theme === 'light' ? 'bg-neutral-300 text-black' : 'bg-neutral-700'" aria-label="Save"><i class="fa-solid fa-floppy-disk"></i></button>
         <button @click="deletePrompt(selectedPrompt)" :disabled="!selectedPrompt" class="px-2 bg-neutral-700 rounded" :class="theme === 'light' ? 'bg-neutral-300 text-black' : 'bg-neutral-700'" aria-label="Delete"><i class="fa-solid fa-trash"></i></button>
+        <button @click="showTemplateModal=true" class="px-2 bg-neutral-700 rounded" :class="theme === 'light' ? 'bg-neutral-300 text-black' : 'bg-neutral-700'" aria-label="Templates"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
       </div>
       <!-- Save modal -->
       <div x-show="showSaveModal" x-transition.opacity.duration.200 class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -47,20 +48,24 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Starter Templates -->
-    <div>
-      <h2 class="font-semibold mb-2">Starter Templates</h2>
-      <div class="flex mb-2 space-x-2">
-        <select x-model="selectedTemplate" @change="applyTemplate(selectedTemplate)" class="flex-1 p-1 bg-neutral-900 rounded focus:outline-none" :class="theme === 'light' ? 'bg-neutral-200 text-black' : 'bg-neutral-900'">
-          <option value="" disabled selected>Select template</option>
-          <template x-for="(tpl, name) in promptTemplates" :key="name">
-            <option :value="name" x-text="name"></option>
-          </template>
-        </select>
+      <!-- Template modal -->
+      <div x-show="showTemplateModal" x-transition.opacity.duration.200 class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-neutral-900 p-4 rounded space-y-2" :class="theme === 'light' ? 'bg-white text-black' : 'bg-neutral-900 text-white'">
+          <h2 class="font-semibold">Starter Templates</h2>
+          <select x-model="selectedTemplate" @change="applyTemplate(selectedTemplate); showTemplateModal=false" class="w-full p-1 bg-neutral-900 rounded focus:outline-none" :class="theme === 'light' ? 'bg-neutral-200 text-black' : 'bg-neutral-900'">
+            <option value="" disabled selected>Select template</option>
+            <template x-for="(tpl, name) in promptTemplates" :key="name">
+              <option :value="name" x-text="name"></option>
+            </template>
+          </select>
+          <div class="flex justify-end">
+            <button @click="showTemplateModal=false" class="px-2 bg-neutral-700 rounded" :class="theme === 'light' ? 'bg-neutral-300 text-black' : 'bg-neutral-700'">Close</button>
+          </div>
+        </div>
       </div>
     </div>
+
+
 
     <!-- Prompt Sections -->
     <div>
@@ -173,6 +178,7 @@
       selectedPrompt:'',
       selectedTemplate:'',
       showSaveModal:false,
+      showTemplateModal:false,
       copied:false,
       theme: localStorage.getItem('theme') || 'dark',
       sortable:null,
