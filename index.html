@@ -12,6 +12,13 @@
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <script type="module">
+    import { pipeline } from "https://cdn.jsdelivr.net/npm/@xenova/transformers@latest/dist/transformers.min.js";
+    window.initLLM = async () => {
+      // Text-generation pipeline against TinyLlama-v0 on HF
+      return await pipeline("text-generation", "Xenova/TinyLlama-v0", { max_new_tokens: 64, temperature: 0.7 });
+    };
+  </script>
 </head>
 <body x-data="promptStudio()" x-init="init()" :class="theme === 'light' ? 'bg-neutral-100 text-black' : 'bg-neutral-950 text-white'" class="h-full p-4 transition-colors duration-300">
   <header class="mb-4 p-2 rounded flex items-center justify-between bg-neutral-900 text-white transition-colors" :class="theme === 'light' ? 'bg-white text-black' : 'bg-neutral-900 text-white'">
@@ -202,11 +209,15 @@
       copied:false,
       theme: localStorage.getItem('theme') || 'dark',
       sortable:null,
-      pipeline:null,
+      loading:false,
+      gen:null,
       llmOutput:'',
       loadingMessage:'',
       logs:[],
-      init(){
+      async init(){
+        this.loading = true;
+        this.gen = await window.initLLM();
+        this.loading = false;
         this.loadSaved();
         this.applyTheme();
         this.$nextTick(() => this.initSortable());
@@ -337,61 +348,16 @@
           if(c) c.scrollTop = c.scrollHeight;
         });
       },
-      async loadScript(src){
-        return new Promise((resolve, reject) => {
-          const s = document.createElement('script');
-          s.src = src;
-          s.onload = resolve;
-          s.onerror = reject;
-          document.head.appendChild(s);
-        });
-      },
-      async ensurePipeline(){
-        if(this.pipeline) return;
-        this.log('Initializing pipeline...');
-        this.loadingMessage = 'Loading model...';
-        try {
-          if(!window.transformers){
-            this.log('Loading transformers library...');
-            try {
-              await this.loadScript('https://cdn.jsdelivr.net/npm/@xenova/transformers/dist/transformers.min.js');
-            } catch(e){
-              this.log('CDN load failed, using local stub.');
-              await this.loadScript('transformers_stub.js');
-            }
-          }
-          if(!window.transformers || !window.transformers.pipeline){
-            this.log('CDN library missing pipeline, using local stub.');
-            await this.loadScript('transformers_stub.js');
-          }
-          if(!window.transformers || !window.transformers.pipeline){
-            throw new Error('Transformers library unavailable');
-          }
-          this.pipeline = await window.transformers.pipeline('text-generation', 'Xenova/TinyLlama-1.1B-Chat-int4');
-          this.log('Model loaded.');
-        } catch(err){
-          this.log('Pipeline load failed: ' + err);
-          throw err;
-        } finally {
-          this.loadingMessage = '';
-        }
-      },
       async runPrompt(){
-        try {
-          await this.ensurePipeline();
-          if(!this.pipeline){
-            throw new Error('Pipeline unavailable');
-          }
-          this.loadingMessage = 'Generating...';
-          this.log('Generating response...');
-          const result = await this.pipeline(this.rendered(), { max_new_tokens: 64 });
-          this.llmOutput = result[0].generated_text;
-          this.log('Generation complete.');
-        } catch(err){
-          this.log('Run error: ' + err);
-        } finally {
-          this.loadingMessage = '';
-        }
+        if(this.loading) return;
+        this.loading = true;
+        this.loadingMessage = "Generating...";
+        this.log("Generating response...");
+        const outputs = await this.gen(this.rendered());
+        this.llmOutput = outputs[0].generated_text || outputs[0].text || "";
+        this.log("Generation complete.");
+        this.loadingMessage = "";
+        this.loading = false;
       },
       initSortable(){
         if(this.sortable) return;
