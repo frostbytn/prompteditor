@@ -353,7 +353,15 @@
         try {
           if(!window.transformers){
             this.log('Loading transformers library...');
-            await this.loadScript('https://cdn.jsdelivr.net/npm/@xenova/transformers/dist/transformers.min.js');
+            try {
+              await this.loadScript('https://cdn.jsdelivr.net/npm/@xenova/transformers/dist/transformers.min.js');
+            } catch(e){
+              this.log('CDN load failed, using local stub.');
+              await this.loadScript('transformers_stub.js');
+            }
+          }
+          if(!window.transformers || !window.transformers.pipeline){
+            throw new Error('Transformers library unavailable');
           }
           this.pipeline = await window.transformers.pipeline('text-generation', 'Xenova/TinyLlama-1.1B-Chat-int4');
           this.log('Model loaded.');
@@ -367,6 +375,9 @@
       async runPrompt(){
         try {
           await this.ensurePipeline();
+          if(!this.pipeline){
+            throw new Error('Pipeline unavailable');
+          }
           this.loadingMessage = 'Generating...';
           this.log('Generating response...');
           const result = await this.pipeline(this.rendered(), { max_new_tokens: 64 });
