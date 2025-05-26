@@ -132,6 +132,14 @@
         <h2 class="font-semibold mb-2">result</h2>
         <div class="bg-neutral-900 rounded p-3 min-h-[4rem]" x-text="llmOutput" :class="theme === 'light' ? 'bg-neutral-200 text-black' : 'bg-neutral-900'"></div>
       </div>
+      <div x-show="logs.length" x-transition.opacity.duration.300 class="mt-4">
+        <h2 class="font-semibold mb-2">logs</h2>
+        <div x-ref="logContainer" class="bg-neutral-900 rounded p-2 max-h-32 overflow-y-auto text-xs" :class="theme === 'light' ? 'bg-neutral-200 text-black' : 'bg-neutral-900'">
+          <template x-for="(log, i) in logs" :key="i">
+            <div x-text="log"></div>
+          </template>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -197,6 +205,7 @@
       pipeline:null,
       llmOutput:'',
       loadingMessage:'',
+      logs:[],
       init(){
         this.loadSaved();
         this.applyTheme();
@@ -321,6 +330,13 @@
         this.copied = true;
         setTimeout(() => this.copied = false, 1500);
       },
+      log(msg){
+        this.logs.push(`[${new Date().toLocaleTimeString()}] ${msg}`);
+        this.$nextTick(() => {
+          const c = this.$refs.logContainer;
+          if(c) c.scrollTop = c.scrollHeight;
+        });
+      },
       async loadScript(src){
         return new Promise((resolve, reject) => {
           const s = document.createElement('script');
@@ -332,19 +348,35 @@
       },
       async ensurePipeline(){
         if(this.pipeline) return;
+        this.log('Initializing pipeline...');
         this.loadingMessage = 'Loading model...';
-        if(!window.transformers){
-          await this.loadScript('https://cdn.jsdelivr.net/npm/@xenova/transformers/dist/transformers.min.js');
+        try {
+          if(!window.transformers){
+            this.log('Loading transformers library...');
+            await this.loadScript('https://cdn.jsdelivr.net/npm/@xenova/transformers/dist/transformers.min.js');
+          }
+          this.pipeline = await window.transformers.pipeline('text-generation', 'Xenova/TinyLlama-1.1B-Chat-int4');
+          this.log('Model loaded.');
+        } catch(err){
+          this.log('Pipeline load failed: ' + err);
+          throw err;
+        } finally {
+          this.loadingMessage = '';
         }
-        this.pipeline = await window.transformers.pipeline('text-generation', 'Xenova/TinyLlama-1.1B-Chat-int4');
-        this.loadingMessage = '';
       },
       async runPrompt(){
-        await this.ensurePipeline();
-        this.loadingMessage = 'Generating...';
-        const result = await this.pipeline(this.rendered(), { max_new_tokens: 64 });
-        this.loadingMessage = '';
-        this.llmOutput = result[0].generated_text;
+        try {
+          await this.ensurePipeline();
+          this.loadingMessage = 'Generating...';
+          this.log('Generating response...');
+          const result = await this.pipeline(this.rendered(), { max_new_tokens: 64 });
+          this.llmOutput = result[0].generated_text;
+          this.log('Generation complete.');
+        } catch(err){
+          this.log('Run error: ' + err);
+        } finally {
+          this.loadingMessage = '';
+        }
       },
       initSortable(){
         if(this.sortable) return;
