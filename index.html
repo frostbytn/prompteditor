@@ -92,6 +92,8 @@
             <button @click="addSection(name)" class="px-2 py-1 bg-neutral-700 rounded text-xs capitalize" :class="theme === 'light' ? 'bg-neutral-300 text-black' : 'bg-neutral-700'" x-text="name"></button>
           </template>
           <button @click="addSection()" class="px-2 py-1 bg-neutral-700 rounded" :class="theme === 'light' ? 'bg-neutral-300 text-black' : 'bg-neutral-700'" aria-label="Add custom section"><i class="fa-solid fa-plus"></i></button>
+          <input type="file" x-ref="fileInput" class="hidden" @change="uploadFile">
+          <button @click="$refs.fileInput.click()" class="px-2 py-1 bg-neutral-700 rounded" :class="theme === 'light' ? 'bg-neutral-300 text-black' : 'bg-neutral-700'">Upload File</button>
         </div>
       </div>
 
@@ -141,7 +143,8 @@
         system:{startTag:'[system]', endTag:'[/system]', autoEndTag:'[/system]', content:'You are a helpful {{name}} with extensive knowledge in {{industry}}.'},
         example:{startTag:'[example]', endTag:'[/example]', autoEndTag:'[/example]', content:'Example content.'},
         task:{startTag:'[task]', endTag:'[/task]', autoEndTag:'[/task]', content:'Describe the task here.'},
-        implementation:{startTag:'[implementation]', endTag:'[/implementation]', autoEndTag:'[/implementation]', content:'Implementation details.'}
+        implementation:{startTag:'[implementation]', endTag:'[/implementation]', autoEndTag:'[/implementation]', content:'Implementation details.'},
+        files:{startTag:'[files]', endTag:'[/files]', autoEndTag:'[/files]', content:''}
       },
       promptTemplates:{
         'Code Assistant':{
@@ -218,6 +221,19 @@
           const idx = this.entries.indexOf(item);
           if(idx !== -1) this.entries.splice(idx,1);
         }, 300);
+      },
+      uploadFile(e){
+        const files = e.target.files;
+        if(!files || files.length === 0) return;
+        Array.from(files).forEach(f => {
+          const reader = new FileReader();
+          reader.onload = evt => {
+            this.sections.push({startTag:'[files]', endTag:'[/files]', autoEndTag:'[/files]', content: evt.target.result, removing:false, collapsed:false});
+            this.$nextTick(() => this.initSortable());
+          };
+          reader.readAsText(f);
+        });
+        e.target.value = '';
       },
       syncEndTag(section){
         const derived = deriveEndTag(section.startTag);
