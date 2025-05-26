@@ -11,6 +11,9 @@ async function run() {
     console.log('Generated token:', result);
   } catch (err) {
     console.error('Generation failed:', err);
+    if(err && err.stack){
+      console.error(err.stack);
+    }
     process.exitCode = 1;
   }
 }

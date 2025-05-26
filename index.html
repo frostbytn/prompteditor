@@ -351,6 +351,9 @@
           this.log('Model loaded.');
         } catch(err){
           this.log('Context init failed: ' + err);
+          if(err && err.stack){
+            this.log(err.stack);
+          }
           throw err;
         } finally {
           this.loadingMessage = '';
@@ -374,6 +377,9 @@
           this.log('Generation complete.');
         } catch(err){
           this.log('Run error: ' + err);
+          if(err && err.stack){
+            this.log(err.stack);
+          }
         } finally {
           this.loadingMessage = '';
         }
