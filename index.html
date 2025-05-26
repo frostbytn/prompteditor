@@ -177,15 +177,16 @@
         this.$nextTick(() => this.initSortable());
       },
       addSection(type){
+        let section;
         if(type && this.sectionTemplates[type]){
-          this.sections.push({...JSON.parse(JSON.stringify(this.sectionTemplates[type])), removing:false});
-          return;
-        }
-        if(this.sections.length === 0){
-          this.sections.push({...JSON.parse(JSON.stringify(this.sectionTemplates.system)), removing:false});
+          section = {...JSON.parse(JSON.stringify(this.sectionTemplates[type])), removing:true};
+        } else if(this.sections.length === 0){
+          section = {...JSON.parse(JSON.stringify(this.sectionTemplates.system)), removing:true};
         } else {
-          this.sections.push({startTag:'[SECTION]', endTag:'[/SECTION]', autoEndTag:'[/SECTION]', content:'', removing:false});
+          section = {startTag:'[SECTION]', endTag:'[/SECTION]', autoEndTag:'[/SECTION]', content:'', removing:true};
         }
+        this.sections.push(section);
+        this.$nextTick(() => requestAnimationFrame(() => section.removing = false));
       },
       removeSection(i){
         const item = this.sections[i];
@@ -197,7 +198,9 @@
         }, 300);
       },
       addEntry(){
-        this.entries.push({key:'', value:'', removing:false});
+        const entry = {key:'', value:'', removing:true};
+        this.entries.push(entry);
+        this.$nextTick(() => requestAnimationFrame(() => entry.removing = false));
       },
       removeEntry(i){
         const item = this.entries[i];
