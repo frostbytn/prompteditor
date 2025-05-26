@@ -6,7 +6,7 @@ A lightweight client-side web app for building and previewing prompt templates f
 
 - Create any number of prompt sections with customizable tag syntax.
 - Quickly add common section types like `system`, `example`, `task` and `implementation`.
-- Manage replacement values in a dynamic key/value list.
+- Manage variables in a dynamic key/value list.
 - Render the final prompt live as plain text.
 - Darker flattened theme built with Tailwind CSS and Alpine.js with optional light mode.
 - Icon-based buttons for a compact interface.
