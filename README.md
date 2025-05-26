@@ -22,8 +22,8 @@ A lightweight client-side web app for building and previewing prompt templates f
 
 Open `index.html` in a browser. No build step or server is required.
 
-Click the play button next to the token count to run your prompt through a lightweight LLaMA model powered by `llama.cpp` compiled to WebAssembly. The runtime is loaded from `/lib/llama-cpp.wasm` and the quantized weights from `/models/ggml-7b-q4.bin`.
+Click the play button next to the token count to run your prompt through a lightweight LLaMA model powered by `llama.cpp` compiled to WebAssembly. The runtime and model are loaded at runtime from public CDNs.
 
-Open DevTools → Network and confirm that both files return **200** and are served with `application/octet-stream`.
+Open DevTools → Network and confirm that the WASM and model files return **200**.
 
 Feel free to customize the default template and styling.
