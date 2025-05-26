@@ -12,6 +12,7 @@ A lightweight client-side web app for building and previewing prompt templates f
 - Icon-based buttons for a compact interface.
 - Reorder sections via drag and drop.
 - Animated interactions with feedback when copying the rendered prompt.
+- Test prompts locally with a lightweight in-browser Llama model.
 - Displays estimated token count for the rendered prompt.
 - Built-in starter templates for code assistants and document extraction.
 - Separate settings page to manage preferences.
@@ -20,5 +21,7 @@ A lightweight client-side web app for building and previewing prompt templates f
 ## Usage
 
 Open `index.html` in a browser. No build step or server is required.
+
+Click the play button next to the token count to run your prompt through the included quantized Llama model. The first run downloads the model files, so it may take a moment.
 
 Feel free to customize the default template and styling.
