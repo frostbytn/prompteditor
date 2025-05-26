@@ -202,7 +202,7 @@
       copied:false,
       theme: localStorage.getItem('theme') || 'dark',
       sortable:null,
-      pipeline:null,
+      llamaCtx:null,
       llmOutput:'',
       loadingMessage:'',
       logs:[],
@@ -337,49 +337,20 @@
           if(c) c.scrollTop = c.scrollHeight;
         });
       },
-      async loadScript(src){
-        return new Promise((resolve, reject) => {
-          const s = document.createElement('script');
-          s.src = src;
-          s.onload = resolve;
-          s.onerror = reject;
-          document.head.appendChild(s);
-        });
-      },
-      async ensurePipeline(){
-        if(this.pipeline) return;
-        this.log('Initializing pipeline...');
+      async ensureLlamaContext(){
+        if(this.llamaCtx) return;
+        this.log('Initializing LLaMA context...');
         this.loadingMessage = 'Loading model...';
-        const sources = [
-          'https://cdn.jsdelivr.net/npm/@xenova/transformers/dist/transformers.min.js',
-          'https://unpkg.com/@xenova/transformers/dist/transformers.min.js'
-        ];
-        let loadedFrom = null;
         try {
-          if(!window.transformers){
-            for(const src of sources){
-              try {
-                this.log('Loading transformers library from ' + src + '...');
-                await this.loadScript(src);
-                if(window.transformers && window.transformers.pipeline){
-                  loadedFrom = src;
-                  break;
-                }
-              } catch(e){
-                this.log('Failed to load from ' + src + ': ' + e);
-              }
-            }
-          }
-          if(!window.transformers || !window.transformers.pipeline){
-            throw new Error('Transformers library unavailable');
-          }
-          this.pipeline = await window.transformers.pipeline('text-generation', 'openlm-research/open_llama_3b');
-          if(loadedFrom){
-            this.log('Transformers loaded from ' + loadedFrom + '.');
-          }
+          const { createLLamaContext } = await import('https://esm.sh/llama-cpp-wasm@0.1.2');
+          this.llamaCtx = await createLLamaContext({
+            wasmURL: '/lib/llama-cpp.wasm',
+            modelURL: '/models/ggml-7b-q4.bin',
+            nThreads: navigator.hardwareConcurrency || 4
+          });
           this.log('Model loaded.');
         } catch(err){
-          this.log('Pipeline load failed: ' + err);
+          this.log('Context init failed: ' + err);
           throw err;
         } finally {
           this.loadingMessage = '';
@@ -387,14 +358,19 @@
       },
       async runPrompt(){
         try {
-          await this.ensurePipeline();
-          if(!this.pipeline){
-            throw new Error('Pipeline unavailable');
+          await this.ensureLlamaContext();
+          if(!this.llamaCtx){
+            throw new Error('Context unavailable');
           }
           this.loadingMessage = 'Generating...';
           this.log('Generating response...');
-          const result = await this.pipeline(this.rendered(), { max_new_tokens: 64 });
-          this.llmOutput = result[0].generated_text;
+          const result = await this.llamaCtx.run({
+            prompt: this.rendered(),
+            nPredict: 64,
+            temperature: 0.7,
+            topK: 40
+          });
+          this.llmOutput = result;
           this.log('Generation complete.');
         } catch(err){
           this.log('Run error: ' + err);

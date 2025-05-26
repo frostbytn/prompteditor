@@ -22,6 +22,8 @@ A lightweight client-side web app for building and previewing prompt templates f
 
 Open `index.html` in a browser. No build step or server is required.
 
-Click the play button next to the token count to run your prompt through a small GPT style model. The app loads the `@xenova/transformers` library from a CDN. The default model uses `openlm-research/open_llama_3b`.
+Click the play button next to the token count to run your prompt through a lightweight LLaMA model powered by `llama.cpp` compiled to WebAssembly. The runtime is loaded from `/lib/llama-cpp.wasm` and the quantized weights from `/models/ggml-7b-q4.bin`.
+
+Open DevTools → Network and confirm that both files return **200** and are served with `application/octet-stream`.
 
 Feel free to customize the default template and styling.
