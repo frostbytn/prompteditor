@@ -22,6 +22,6 @@ A lightweight client-side web app for building and previewing prompt templates f
 
 Open `index.html` in a browser. No build step or server is required.
 
-Click the play button next to the token count to run your prompt through a small GPT style model. The app tries to load the `transformers` library from a CDN and will fall back to the included `transformers_stub.js` if the network request fails. The default model uses `openlm-research/open_llama_3b`.
+Click the play button next to the token count to run your prompt through a small GPT style model. The app loads the `@xenova/transformers` library from a CDN. The default model uses `openlm-research/open_llama_3b`.
 
 Feel free to customize the default template and styling.
