@@ -352,15 +352,20 @@
         this.loadingMessage = 'Loading model...';
         const sources = [
           'https://cdn.jsdelivr.net/npm/@xenova/transformers/dist/transformers.min.js',
-          'https://unpkg.com/@xenova/transformers/dist/transformers.min.js'
+          'https://unpkg.com/@xenova/transformers/dist/transformers.min.js',
+          './transformers_stub.js'
         ];
+        let loadedFrom = null;
         try {
           if(!window.transformers){
             for(const src of sources){
               try {
                 this.log('Loading transformers library from ' + src + '...');
                 await this.loadScript(src);
-                if(window.transformers && window.transformers.pipeline) break;
+                if(window.transformers && window.transformers.pipeline){
+                  loadedFrom = src;
+                  break;
+                }
               } catch(e){
                 this.log('Failed to load from ' + src + ': ' + e);
               }
@@ -369,7 +374,10 @@
           if(!window.transformers || !window.transformers.pipeline){
             throw new Error('Transformers library unavailable');
           }
-          this.pipeline = await window.transformers.pipeline('text-generation', 'Xenova/TinyLlama-1.1B-Chat-int4');
+          this.pipeline = await window.transformers.pipeline('text-generation', 'openlm-research/open_llama_3b');
+          if(loadedFrom){
+            this.log('Transformers loaded from ' + loadedFrom + '.');
+          }
           this.log('Model loaded.');
         } catch(err){
           this.log('Pipeline load failed: ' + err);
