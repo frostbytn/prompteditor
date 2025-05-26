@@ -177,16 +177,15 @@
         this.$nextTick(() => this.initSortable());
       },
       addSection(type){
-        let section;
         if(type && this.sectionTemplates[type]){
-          section = {...JSON.parse(JSON.stringify(this.sectionTemplates[type])), removing:true};
-        } else if(this.sections.length === 0){
-          section = {...JSON.parse(JSON.stringify(this.sectionTemplates.system)), removing:true};
-        } else {
-          section = {startTag:'[SECTION]', endTag:'[/SECTION]', autoEndTag:'[/SECTION]', content:'', removing:true};
+          this.sections.push({...JSON.parse(JSON.stringify(this.sectionTemplates[type])), removing:false});
+          return;
         }
-        this.sections.push(section);
-        this.$nextTick(() => requestAnimationFrame(() => section.removing = false));
+        if(this.sections.length === 0){
+          this.sections.push({...JSON.parse(JSON.stringify(this.sectionTemplates.system)), removing:false});
+        } else {
+          this.sections.push({startTag:'[SECTION]', endTag:'[/SECTION]', autoEndTag:'[/SECTION]', content:'', removing:false});
+        }
       },
       removeSection(i){
         const item = this.sections[i];
@@ -198,9 +197,7 @@
         }, 300);
       },
       addEntry(){
-        const entry = {key:'', value:'', removing:true};
-        this.entries.push(entry);
-        this.$nextTick(() => requestAnimationFrame(() => entry.removing = false));
+        this.entries.push({key:'', value:'', removing:false});
       },
       removeEntry(i){
         const item = this.entries[i];
