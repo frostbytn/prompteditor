@@ -22,6 +22,6 @@ A lightweight client-side web app for building and previewing prompt templates f
 
 Open `index.html` in a browser. No build step or server is required.
 
-Click the play button next to the token count to run your prompt through the included quantized Llama model. The first run downloads the model files, so it may take a moment.
+Click the play button next to the token count to run your prompt through a small GPT style model. The first run fetches the `@xenova/transformers` library from a CDN (jsDelivr or unpkg) and downloads the TinyLlama weights, so generation may take a moment.
 
 Feel free to customize the default template and styling.
