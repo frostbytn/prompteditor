@@ -361,6 +361,10 @@
             }
           }
           if(!window.transformers || !window.transformers.pipeline){
+            this.log('CDN library missing pipeline, using local stub.');
+            await this.loadScript('transformers_stub.js');
+          }
+          if(!window.transformers || !window.transformers.pipeline){
             throw new Error('Transformers library unavailable');
           }
           this.pipeline = await window.transformers.pipeline('text-generation', 'Xenova/TinyLlama-1.1B-Chat-int4');
