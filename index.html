@@ -345,13 +345,13 @@
         try {
           const { Wllama } = await import('https://cdn.jsdelivr.net/npm/@wllama/wllama@latest/esm/index.js');
           const wasmURL = 'https://cdn.jsdelivr.net/npm/@wllama/wllama@latest/esm/single-thread/wllama.wasm';
-          // Load the smaller Gemma model to reduce memory usage
-          const modelRepo = 'google/gemma-3-1b-it-qat-q4_0-gguf';
-          const modelFile = 'gemma-3-1b-it-qat-q4_0.gguf';
+          // Stream the TheBloke 3B model directly inside the worker
+          const modelRepo = 'TheBloke/rocket-3B-GGUF';
+          const modelFile = 'rocket-3b.Q4_K_M.gguf';
           this.log('Instantiating WASM from ' + wasmURL);
           const llama = new Wllama(
             { 'single-thread/wllama.wasm': wasmURL },
-            { parallelDownloads: 1, allowOffline: false }
+            { parallelDownloads: 5, allowOffline: false }
           );
           this.log('Loading model from ' + modelRepo + '/' + modelFile);
           await llama.loadModelFromHF(modelRepo, modelFile);
