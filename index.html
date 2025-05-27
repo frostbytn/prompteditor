@@ -343,10 +343,15 @@
         this.log('Initializing LLaMA context...');
         this.loadingMessage = 'Loading model...';
         try {
-          const { createLLamaContext } = await import('https://cdn.jsdelivr.net/gh/tangledgroup/llama-cpp-wasm@main/dist/llama-mt/llama.js');
+          const llamaURL = 'https://cdn.jsdelivr.net/gh/tangledgroup/llama-cpp-wasm@main/dist/llama-mt/llama.js';
+          const wasmURL = 'https://cdn.jsdelivr.net/gh/tangledgroup/llama-cpp-wasm@main/dist/llama-mt/llama-cpp.wasm';
+          const modelURL = 'https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.q4_0.gguf';
+          this.log('Loading llama module from ' + llamaURL);
+          const { createLLamaContext } = await import(llamaURL);
+          this.log('Creating context with model ' + modelURL);
           this.llamaCtx = await createLLamaContext({
-            wasmURL: 'https://cdn.jsdelivr.net/gh/tangledgroup/llama-cpp-wasm@main/dist/llama-mt/llama-cpp.wasm',
-            modelURL: 'https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.q4_0.gguf',
+            wasmURL,
+            modelURL,
             nThreads: navigator.hardwareConcurrency || 4
           });
           this.log('Model loaded.');
@@ -436,6 +441,25 @@
         }
       }
     });
+
+    // Mirror console output to the in-app log window for easier debugging
+    ['log','info','warn','error'].forEach(type => {
+      const orig = console[type];
+      console[type] = (...args) => {
+        orig.apply(console, args);
+        const app = window.promptStudioApp;
+        if(app && app.log){
+          const msg = args.map(a => {
+            if(typeof a === 'object'){
+              try { return JSON.stringify(a); } catch(e){ return String(a); }
+            }
+            return String(a);
+          }).join(' ');
+          app.log('console.' + type + ': ' + msg);
+        }
+      };
+    });
+    console.log('Console output redirected to log window.');
   </script>
 </body>
 </html>
