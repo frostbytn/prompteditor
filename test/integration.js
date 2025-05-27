@@ -1,8 +1,9 @@
-import { createLLamaContext } from 'https://tangledgroup.github.io/llama-cpp-wasm/dist/llama-mt/llama.js';
+import { createLLamaContext } from 'https://cdn.jsdelivr.net/gh/tangledgroup/llama-cpp-wasm@main/dist/llama-mt/llama.js';
 
 async function run() {
   try {
     const ctx = await createLLamaContext({
+      wasmURL: 'https://cdn.jsdelivr.net/gh/tangledgroup/llama-cpp-wasm@main/dist/llama-mt/llama-cpp.wasm',
       modelURL: 'https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.q4_0.gguf',
       nThreads: 1
     });
