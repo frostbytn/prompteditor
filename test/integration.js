@@ -3,7 +3,7 @@ import { Wllama } from 'https://cdn.jsdelivr.net/npm/@wllama/wllama@2.3.1/esm/in
 async function run() {
   try {
     const wasmURL = 'https://cdn.jsdelivr.net/npm/@wllama/wllama@2.3.1/esm/single-thread/wllama.wasm';
-    const modelURL = 'https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.q4_0.gguf?download=1';
+    const modelURL = 'https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.q4_0.gguf';
     const llama = new Wllama({ 'single-thread/wllama.wasm': wasmURL });
     await llama.loadModelFromUrl(modelURL);
     const result = await llama.createCompletion('Hello,', { nPredict: 1 });
