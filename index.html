@@ -370,11 +370,13 @@
           }
           this.loadingMessage = 'Generating...';
           this.log('Generating response...');
-          const result = await this.llamaCtx.createCompletion(
+          this.llmOutput = '';
+          for await (const chunk of this.llamaCtx.createCompletion(
             this.rendered(),
             { nPredict: 64, temp: 0.7, top_k: 40 }
-          );
-          this.llmOutput = Array.isArray(result) ? result.join('') : result;
+          )) {
+            this.llmOutput += chunk;
+          }
           this.log('Generation complete.');
         } catch(err){
           this.log('Run error: ' + err);
