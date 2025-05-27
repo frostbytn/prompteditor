@@ -343,14 +343,18 @@
         this.log('Initializing WLLama context...');
         this.loadingMessage = 'Loading model...';
         try {
-          const { Wllama } = await import('https://cdn.jsdelivr.net/npm/@wllama/wllama@2.3.1/esm/index.js');
-          const wasmURL = 'https://cdn.jsdelivr.net/npm/@wllama/wllama@2.3.1/esm/single-thread/wllama.wasm';
-          // Use a smaller TheBloke 3B model (~60 MB) instead of TinyLlama.
-          const modelURL = 'https://huggingface.co/TheBloke/rocket-3B-GGUF/resolve/main/rocket-3b.Q4_K_M.gguf';
+          const { Wllama } = await import('https://cdn.jsdelivr.net/npm/@wllama/wllama@latest/esm/index.js');
+          const wasmURL = 'https://cdn.jsdelivr.net/npm/@wllama/wllama@latest/esm/single-thread/wllama.wasm';
+          // Stream the TheBloke 3B model directly inside the worker
+          const modelRepo = 'TheBloke/rocket-3B-GGUF';
+          const modelFile = 'rocket-3b.Q4_K_M.gguf';
           this.log('Instantiating WASM from ' + wasmURL);
-          const llama = new Wllama({ 'single-thread/wllama.wasm': wasmURL });
-          this.log('Loading model from ' + modelURL);
-          await llama.loadModelFromUrl(modelURL);
+          const llama = new Wllama(
+            { 'single-thread/wllama.wasm': wasmURL },
+            { parallelDownloads: 5, allowOffline: false }
+          );
+          this.log('Loading model from ' + modelRepo + '/' + modelFile);
+          await llama.loadModelFromHF(modelRepo, modelFile);
           this.llamaCtx = llama;
           this.log('Model loaded.');
         } catch(err){
@@ -372,10 +376,12 @@
           this.loadingMessage = 'Generating...';
           this.log('Generating response...');
           this.llmOutput = '';
-          this.llmOutput = await this.llamaCtx.createCompletion(
+          for await (const chunk of this.llamaCtx.createCompletion(
             this.rendered(),
-              { nPredict: 64, temp: 0.7, topK: 40 }
-          );
+            { nPredict: 64, temp: 0.7, topK: 40 }
+          )) {
+            this.llmOutput += chunk;
+          }
           this.log('Generation complete.');
         } catch(err){
           this.log('Run error: ' + err);
