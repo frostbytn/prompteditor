@@ -346,20 +346,17 @@
       },
       async ensureLlamaContext(){
         if(this.llamaCtx) return;
-        this.log('Initializing LLaMA context...');
+        this.log('Initializing WLLama context...');
         this.loadingMessage = 'Loading model...';
         try {
-          const llamaURL = 'https://cdn.jsdelivr.net/gh/tangledgroup/llama-cpp-wasm@main/dist/llama-mt/llama.js?module';
-          const wasmURL = 'https://cdn.jsdelivr.net/gh/tangledgroup/llama-cpp-wasm@main/dist/llama-mt/llama-cpp.wasm';
+          const { Wllama } = await import('https://cdn.jsdelivr.net/npm/@wllama/wllama@2.3.1/esm/index.js');
+          const wasmURL = 'https://cdn.jsdelivr.net/npm/@wllama/wllama@2.3.1/esm/single-thread/wllama.wasm';
           const modelURL = 'https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.q4_0.gguf';
-          this.log('Loading llama module from ' + llamaURL);
-          const { createLLamaContext } = await import(llamaURL);
-          this.log('Creating context with model ' + modelURL);
-          this.llamaCtx = await createLLamaContext({
-            wasmURL,
-            modelURL,
-            nThreads: navigator.hardwareConcurrency || 4
-          });
+          this.log('Instantiating WASM from ' + wasmURL);
+          const llama = new Wllama({ 'single-thread/wllama.wasm': wasmURL });
+          this.log('Loading model from ' + modelURL);
+          await llama.loadModelFromUrl(modelURL);
+          this.llamaCtx = llama;
           this.log('Model loaded.');
         } catch(err){
           this.log('Context init failed: ' + err);
@@ -379,12 +376,10 @@
           }
           this.loadingMessage = 'Generating...';
           this.log('Generating response...');
-          const result = await this.llamaCtx.run({
-            prompt: this.rendered(),
-            nPredict: 64,
-            temperature: 0.7,
-            topK: 40
-          });
+          const result = await this.llamaCtx.createCompletion(
+            this.rendered(),
+            { nPredict: 64, temp: 0.7, top_k: 40 }
+          );
           this.llmOutput = Array.isArray(result) ? result.join('') : result;
           this.log('Generation complete.');
         } catch(err){

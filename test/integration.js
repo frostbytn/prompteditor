@@ -1,13 +1,12 @@
-import { createLLamaContext } from 'https://cdn.jsdelivr.net/gh/tangledgroup/llama-cpp-wasm@main/dist/llama-mt/llama.js?module';
+import { Wllama } from 'https://cdn.jsdelivr.net/npm/@wllama/wllama@2.3.1/esm/index.js';
 
 async function run() {
   try {
-    const ctx = await createLLamaContext({
-      wasmURL: 'https://cdn.jsdelivr.net/gh/tangledgroup/llama-cpp-wasm@main/dist/llama-mt/llama-cpp.wasm',
-      modelURL: 'https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.q4_0.gguf',
-      nThreads: 1
-    });
-    const result = await ctx.run({ prompt: 'Hello,', nPredict: 1 });
+    const wasmURL = 'https://cdn.jsdelivr.net/npm/@wllama/wllama@2.3.1/esm/single-thread/wllama.wasm';
+    const modelURL = 'https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.q4_0.gguf';
+    const llama = new Wllama({ 'single-thread/wllama.wasm': wasmURL });
+    await llama.loadModelFromUrl(modelURL);
+    const result = await llama.createCompletion('Hello,', { nPredict: 1 });
     console.log('Generated token:', Array.isArray(result) ? result.join('') : result);
   } catch (err) {
     console.error('Generation failed:', err);
