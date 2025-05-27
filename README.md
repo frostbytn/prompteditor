@@ -27,9 +27,3 @@ Click the play button next to the token count to run your prompt through a light
 Open DevTools → Network and confirm that the WASM and model files return **200**.
 
 Feel free to customize the default template and styling.
-
-### Testing Gemma Model
-
-The repository includes a small script `initWllamaGemma.js` and a test at
-`test/gemma.js` for loading the lighter Gemma model. Run `npm test` to execute
-both the default integration test and the Gemma test.
