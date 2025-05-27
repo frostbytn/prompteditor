@@ -10,6 +10,12 @@
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script defer src="https://unpkg.com/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+  <script>
+    document.addEventListener('alpine:init', () => {
+      Alpine.plugin(window.AlpineCollapse)
+    })
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 </head>
@@ -343,7 +349,7 @@
         this.log('Initializing LLaMA context...');
         this.loadingMessage = 'Loading model...';
         try {
-          const llamaURL = 'https://cdn.jsdelivr.net/gh/tangledgroup/llama-cpp-wasm@main/dist/llama-mt/llama.js';
+          const llamaURL = 'https://cdn.jsdelivr.net/gh/tangledgroup/llama-cpp-wasm@main/dist/llama-mt/llama.js?module';
           const wasmURL = 'https://cdn.jsdelivr.net/gh/tangledgroup/llama-cpp-wasm@main/dist/llama-mt/llama-cpp.wasm';
           const modelURL = 'https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.q4_0.gguf';
           this.log('Loading llama module from ' + llamaURL);
