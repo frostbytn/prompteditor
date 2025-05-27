@@ -6,8 +6,11 @@ async function run() {
     const modelURL = 'https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.Q4_0.gguf';
     const llama = new Wllama({ 'single-thread/wllama.wasm': wasmURL });
     await llama.loadModelFromUrl(modelURL);
-    const result = await llama.createCompletion('Hello,', { nPredict: 1 });
-    console.log('Generated token:', Array.isArray(result) ? result.join('') : result);
+    let out = '';
+    for await (const chunk of llama.createCompletion('Hello,', { nPredict: 1 })) {
+      out += chunk;
+    }
+    console.log('Generated token:', out);
   } catch (err) {
     console.error('Generation failed:', err);
     if(err && err.stack){
