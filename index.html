@@ -343,9 +343,8 @@
         this.log('Initializing LLaMA context...');
         this.loadingMessage = 'Loading model...';
         try {
-          const { createLLamaContext } = await import('https://cdn.jsdelivr.net/npm/llama-cpp-wasm@0.1.2/+esm');
+          const { createLLamaContext } = await import('https://tangledgroup.github.io/llama-cpp-wasm/dist/llama-mt/llama.js');
           this.llamaCtx = await createLLamaContext({
-            wasmURL: 'https://cdn.jsdelivr.net/npm/llama-cpp-wasm@0.1.2/llama-cpp.wasm',
             modelURL: 'https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.q4_0.gguf',
             nThreads: navigator.hardwareConcurrency || 4
           });
@@ -374,7 +373,7 @@
             temperature: 0.7,
             topK: 40
           });
-          this.llmOutput = result;
+          this.llmOutput = Array.isArray(result) ? result.join('') : result;
           this.log('Generation complete.');
         } catch(err){
           this.log('Run error: ' + err);
