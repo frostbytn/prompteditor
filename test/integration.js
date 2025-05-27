@@ -1,4 +1,4 @@
-import { createLLamaContext } from 'https://cdn.jsdelivr.net/gh/tangledgroup/llama-cpp-wasm@main/dist/llama-mt/llama.js';
+import { createLLamaContext } from 'https://cdn.jsdelivr.net/gh/tangledgroup/llama-cpp-wasm@main/dist/llama-mt/llama.js?module';
 
 async function run() {
   try {
