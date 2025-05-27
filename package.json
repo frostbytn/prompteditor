@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "test": "node --experimental-network-imports test/integration.js"
+    "test": "node --experimental-network-imports test/integration.js && node --experimental-network-imports test/gemma.js"
   }
 }
