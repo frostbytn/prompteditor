@@ -16,7 +16,10 @@
 <body x-data="promptStudio()" x-init="init()" :class="theme === 'light' ? 'bg-neutral-100 text-black' : 'bg-neutral-950 text-white'" class="h-full p-4 transition-colors duration-300">
   <header class="mb-4 p-2 rounded flex items-center justify-between bg-neutral-900 text-white transition-colors" :class="theme === 'light' ? 'bg-white text-black' : 'bg-neutral-900 text-white'">
     <h1 class="font-bold">promptbin</h1>
-    <nav>
+    <nav class="flex items-center space-x-2">
+      <button @click="toggleTheme()" class="p-2" aria-label="Toggle theme">
+        <i :class="theme === 'light' ? 'fa-solid fa-moon' : 'fa-solid fa-sun'"></i>
+      </button>
       <a href="settings.html" class="p-2" aria-label="Settings"><i class="fa-solid fa-gear"></i></a>
     </nav>
   </header>
