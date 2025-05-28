@@ -9,6 +9,7 @@ A lightweight client-side web app for building and previewing prompt templates f
 - Manage variables in a dynamic key/value list.
 - Render the final prompt live as plain text.
 - Darker flattened theme built with Tailwind CSS and Alpine.js with optional light mode.
+- Quick toggle for dark/light mode directly from the header.
 - Icon-based buttons for a compact interface.
 - Reorder sections via drag and drop.
 - Animated interactions with feedback when copying the rendered prompt.
