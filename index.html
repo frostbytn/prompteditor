@@ -394,6 +394,8 @@
                 this.log('Generation error: ' + d.message);
                 if(d.stack) this.log(d.stack);
                 reject(new Error(d.message));
+              }else if(d.type === 'log'){
+                this.log(d.message);
               }
             };
             worker.addEventListener('message', onMessage);
