@@ -24,7 +24,11 @@ self.addEventListener('message', async (e) => {
       const { Wllama } = await import('https://cdn.jsdelivr.net/npm/@wllama/wllama@latest/esm/index.js');
       const wasmURL = 'https://cdn.jsdelivr.net/npm/@wllama/wllama@latest/esm/single-thread/wllama.wasm';
       const llama = new Wllama({ 'single-thread/wllama.wasm': wasmURL }, { parallelDownloads: 5, allowOffline: false });
-      await llama.loadModelFromHF('TheBloke/rocket-3B-GGUF', 'rocket-3b.Q4_K_M.gguf');
+      await llama.loadModelFromHF(
+        'TheBloke/rocket-3B-GGUF',
+        'rocket-3b.Q4_K_M.gguf',
+        { nCtx: 4096 }
+      );
       self.llama = llama;
       log('Model ready.');
       self.postMessage({ type: 'init' });
