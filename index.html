@@ -380,14 +380,12 @@
           this.log('Generating response...');
           this.log('Prompt length: ' + prompt.length);
 
-          this.llmOutput = '';
-          for await (const chunk of this.llamaCtx.createCompletion(
+          const responseText = await this.llamaCtx.createCompletion(
             prompt,
             { nPredict: 64, temp: 0.7, topK: 40 }
-          )){
-            this.log('Chunk: ' + chunk);
-            this.llmOutput += chunk;
-          }
+          );
+
+          this.llmOutput = responseText;
           this.log('Generation complete.');
         } catch(err){
           this.log('Run error: ' + err);
@@ -398,14 +396,11 @@
             this.log('DataCloneError detected - resetting context and retrying');
             try{
               await this.ensureLlamaContext(true);
-              this.llmOutput = '';
-              for await (const chunk of this.llamaCtx.createCompletion(
+              const retryText = await this.llamaCtx.createCompletion(
                 prompt,
                 { nPredict: 64, temp: 0.7, topK: 40 }
-              )){
-                this.log('Chunk(retry): ' + chunk);
-                this.llmOutput += chunk;
-              }
+              );
+              this.llmOutput = retryText;
               this.log('Generation complete after retry.');
             }catch(err2){
               this.log('Retry failed: ' + err2);
