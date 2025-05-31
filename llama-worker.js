@@ -25,8 +25,17 @@ self.addEventListener('message', async (e) => {
         throw new Error('Model not initialized');
       }
       let out = '';
-      for await (const chunk of self.llama.createCompletion(prompt, { nPredict: 64, temp: 0.7, topK: 40 })) {
-        out += chunk;
+      const result = self.llama.createCompletion(prompt, {
+        nPredict: 64,
+        temp: 0.7,
+        topK: 40
+      });
+      if (result && typeof result[Symbol.asyncIterator] === 'function') {
+        for await (const chunk of result) {
+          out += chunk;
+        }
+      } else {
+        out += await result;
       }
       self.postMessage({ type: 'result', text: out });
     }
