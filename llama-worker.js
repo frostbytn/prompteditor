@@ -1,3 +1,11 @@
+// The @wllama/wllama ESM build expects a browser-like `document` global so it
+// can resolve relative resources. Workers don't provide this by default. Create
+// a minimal stub using `import.meta.url` at module load time so any subsequent
+// imports see it immediately.
+if (typeof globalThis.document === 'undefined') {
+  globalThis.document = { currentScript: { src: import.meta.url } };
+}
+
 self.addEventListener('message', async (e) => {
   const { action, prompt } = e.data || {};
   try {
@@ -5,12 +13,6 @@ self.addEventListener('message', async (e) => {
       if (self.llama) {
         self.postMessage({ type: 'init' });
         return;
-      }
-      // The @wllama/wllama ESM build expects a `document` global to
-      // determine its base URL. Web workers don't provide this by
-      // default, so create a minimal stub before importing the module.
-      if (typeof self.document === 'undefined') {
-        self.document = { currentScript: { src: self.location.href } };
       }
       const { Wllama } = await import('https://cdn.jsdelivr.net/npm/@wllama/wllama@latest/esm/index.js');
       const wasmURL = 'https://cdn.jsdelivr.net/npm/@wllama/wllama@latest/esm/single-thread/wllama.wasm';
