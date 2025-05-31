@@ -6,6 +6,12 @@ self.addEventListener('message', async (e) => {
         self.postMessage({ type: 'init' });
         return;
       }
+      // The @wllama/wllama ESM build expects a `document` global to
+      // determine its base URL. Web workers don't provide this by
+      // default, so create a minimal stub before importing the module.
+      if (typeof self.document === 'undefined') {
+        self.document = { currentScript: { src: self.location.href } };
+      }
       const { Wllama } = await import('https://cdn.jsdelivr.net/npm/@wllama/wllama@latest/esm/index.js');
       const wasmURL = 'https://cdn.jsdelivr.net/npm/@wllama/wllama@latest/esm/single-thread/wllama.wasm';
       const llama = new Wllama({ 'single-thread/wllama.wasm': wasmURL }, { parallelDownloads: 5, allowOffline: false });

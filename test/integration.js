@@ -1,3 +1,9 @@
+// The ESM bundle expects a browser-like `document` global to resolve
+// resource URLs. Provide a minimal stub when running under Node.
+if (typeof globalThis.document === 'undefined') {
+  globalThis.document = { currentScript: { src: import.meta.url } };
+}
+
 import { Wllama } from 'https://cdn.jsdelivr.net/npm/@wllama/wllama@latest/esm/index.js';
 
 async function run() {
