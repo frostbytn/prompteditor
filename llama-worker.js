@@ -13,7 +13,7 @@ function log(message) {
 }
 
 self.addEventListener('message', async (e) => {
-  const { action, prompt, params } = e.data || {};
+  const { action, prompt } = e.data || {};
   try {
     if (action === 'init') {
       if (self.llama) {
@@ -33,14 +33,12 @@ self.addEventListener('message', async (e) => {
         throw new Error('Model not initialized');
       }
       log('Creating completion...');
-      const opts = {
+      let out = '';
+      let result = self.llama.createCompletion(prompt, {
         nPredict: 256,
         temp: 0.7,
-        topK: 40,
-        ...(params || {})
-      };
-      let out = '';
-      let result = self.llama.createCompletion(prompt, opts);
+        topK: 40
+      });
 
       if (result && typeof result.then === 'function') {
         log('createCompletion returned a Promise');
