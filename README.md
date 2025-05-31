@@ -16,7 +16,6 @@ A lightweight client-side web app for building and previewing prompt templates f
 - Displays estimated token count for the rendered prompt.
 - Built-in starter templates for code assistants and document extraction.
 - Separate settings page to manage preferences.
-- Control generation parameters like max tokens, temperature and top-K via sliders, saved in local storage.
 - Upload files and automatically capture their text in a `[files]` section.
 
 ## Usage

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full" x-data="settingsManager()" x-init="initSettings()">
+<html lang="en" class="h-full" x-data="themeManager()" x-init="initTheme()">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,54 +18,30 @@
       <a href="index.html" class="p-2" aria-label="Home"><i class="fa-solid fa-house"></i></a>
     </nav>
   </header>
-  <div class="bg-neutral-900 rounded-lg shadow-lg p-6 w-72 mx-auto transition-colors" :class="theme === 'light' ? 'bg-white text-black' : 'bg-neutral-900 text-white'">
+  <div class="bg-neutral-900 rounded-lg shadow-lg p-6 w-60 mx-auto transition-colors" :class="theme === 'light' ? 'bg-white text-black' : 'bg-neutral-900 text-white'">
     <h1 class="text-xl font-bold mb-4 text-center">Settings</h1>
     <label class="flex items-center space-x-2 mb-4">
-      <input type="checkbox" @change="toggleTheme(); saveSettings()" :checked="theme === 'light'">
+      <input type="checkbox" @change="toggleTheme()" :checked="theme === 'light'">
       <span>Light Mode</span>
     </label>
-
-    <div class="mb-4">
-      <label class="block text-sm">Max Tokens: <span x-text="nPredict"></span></label>
-      <input type="range" min="32" max="512" step="1" x-model.number="nPredict" @input="saveSettings()" class="w-full">
-    </div>
-
-    <div class="mb-4">
-      <label class="block text-sm">Temperature: <span x-text="temp.toFixed(2)"></span></label>
-      <input type="range" min="0" max="1" step="0.01" x-model.number="temp" @input="saveSettings()" class="w-full">
-    </div>
-
-    <div class="mb-4">
-      <label class="block text-sm">Top&nbsp;K: <span x-text="topK"></span></label>
-      <input type="range" min="1" max="100" step="1" x-model.number="topK" @input="saveSettings()" class="w-full">
-    </div>
-
     <a href="index.html" class="underline text-sm">Back</a>
   </div>
 
 <script>
-function settingsManager(){
+function themeManager(){
   return {
     theme: localStorage.getItem('theme') || 'dark',
-    nPredict: parseInt(localStorage.getItem('nPredict')) || 256,
-    temp: parseFloat(localStorage.getItem('temp')) || 0.7,
-    topK: parseInt(localStorage.getItem('topK')) || 40,
-    initSettings(){
+    initTheme(){
       this.applyTheme();
     },
     toggleTheme(){
       this.theme = this.theme === 'dark' ? 'light' : 'dark';
+      this.applyTheme();
     },
     applyTheme(){
       document.documentElement.classList.remove('light','dark');
       document.documentElement.classList.add(this.theme);
-    },
-    saveSettings(){
       localStorage.setItem('theme', this.theme);
-      localStorage.setItem('nPredict', this.nPredict);
-      localStorage.setItem('temp', this.temp);
-      localStorage.setItem('topK', this.topK);
-      this.applyTheme();
     }
   }
 }
