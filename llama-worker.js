@@ -6,6 +6,12 @@ if (typeof globalThis.document === 'undefined') {
   globalThis.document = { currentScript: { src: import.meta.url } };
 }
 
+function log(message) {
+  try {
+    self.postMessage({ type: 'log', message: String(message) });
+  } catch (_) {}
+}
+
 self.addEventListener('message', async (e) => {
   const { action, prompt } = e.data || {};
   try {
@@ -14,28 +20,39 @@ self.addEventListener('message', async (e) => {
         self.postMessage({ type: 'init' });
         return;
       }
+      log('Loading WLLama...');
       const { Wllama } = await import('https://cdn.jsdelivr.net/npm/@wllama/wllama@latest/esm/index.js');
       const wasmURL = 'https://cdn.jsdelivr.net/npm/@wllama/wllama@latest/esm/single-thread/wllama.wasm';
       const llama = new Wllama({ 'single-thread/wllama.wasm': wasmURL }, { parallelDownloads: 5, allowOffline: false });
       await llama.loadModelFromHF('TheBloke/rocket-3B-GGUF', 'rocket-3b.Q4_K_M.gguf');
       self.llama = llama;
+      log('Model ready.');
       self.postMessage({ type: 'init' });
     } else if (action === 'generate') {
       if (!self.llama) {
         throw new Error('Model not initialized');
       }
+      log('Creating completion...');
       let out = '';
-      const result = self.llama.createCompletion(prompt, {
+      let result = self.llama.createCompletion(prompt, {
         nPredict: 64,
         temp: 0.7,
         topK: 40
       });
+
+      if (result && typeof result.then === 'function') {
+        log('createCompletion returned a Promise');
+        result = await result;
+      }
+
       if (result && typeof result[Symbol.asyncIterator] === 'function') {
+        log('Processing async iterator result');
         for await (const chunk of result) {
           out += chunk;
         }
       } else {
-        out += await result;
+        log('Processing direct result');
+        out += result;
       }
       self.postMessage({ type: 'result', text: out });
     }
