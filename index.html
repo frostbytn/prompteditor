@@ -16,8 +16,9 @@
 <body x-data="promptStudio()" x-init="init()" :class="theme === 'light' ? 'bg-neutral-100 text-black' : 'bg-neutral-950 text-white'" class="h-full p-4 transition-colors duration-300">
   <header class="mb-4 p-2 rounded flex items-center justify-between bg-neutral-900 text-white transition-colors" :class="theme === 'light' ? 'bg-white text-black' : 'bg-neutral-900 text-white'">
     <h1 class="font-bold">promptbin</h1>
-    <nav>
+    <nav class="flex space-x-2">
       <a href="settings.html" class="p-2" aria-label="Settings"><i class="fa-solid fa-gear"></i></a>
+      <button @click="showHelpModal=true" class="p-2" aria-label="Help"><i class="fa-solid fa-circle-question"></i></button>
     </nav>
   </header>
   <div class="w-full max-w-5xl mx-auto rounded-lg shadow-lg p-6 flex flex-col md:flex-row gap-6 transition-colors" :class="theme === 'light' ? 'bg-white text-black' : 'bg-neutral-900 text-white'">
@@ -60,6 +61,25 @@
           </select>
           <div class="flex justify-end">
             <button @click="showTemplateModal=false" class="px-2 bg-neutral-700 rounded" :class="theme === 'light' ? 'bg-neutral-300 text-black' : 'bg-neutral-700'">Close</button>
+          </div>
+        </div>
+      </div>
+      <!-- Help modal -->
+      <div x-show="showHelpModal" x-transition.opacity.duration.200 class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-neutral-900 p-4 rounded space-y-2 max-w-lg overflow-y-auto" :class="theme === 'light' ? 'bg-white text-black' : 'bg-neutral-900 text-white'">
+          <h2 class="font-semibold text-lg">How to Use</h2>
+          <p class="text-sm">promptbin lets you build and test prompt templates entirely in the browser. A sample prompt loads by default so you can hit the <i class='fa-solid fa-play'></i> button right away. Model inference runs locally so generation may take a little while.</p>
+          <h3 class="font-semibold mt-2">Features</h3>
+          <ul class="list-disc list-inside text-sm space-y-1">
+            <li>Create any number of prompt sections with custom tags</li>
+            <li>Manage variables as key/value pairs</li>
+            <li>Drag to reorder sections and add common types quickly</li>
+            <li>Upload files to insert their text automatically</li>
+            <li>Run prompts with an in‑browser Llama model</li>
+            <li>Estimate token count of the rendered prompt</li>
+          </ul>
+          <div class="flex justify-end">
+            <button @click="showHelpModal=false" class="px-2 bg-neutral-700 rounded" :class="theme === 'light' ? 'bg-neutral-300 text-black' : 'bg-neutral-700'">Close</button>
           </div>
         </div>
       </div>
@@ -200,6 +220,7 @@
       selectedTemplate:'',
       showSaveModal:false,
       showTemplateModal:false,
+      showHelpModal:false,
       copied:false,
       theme: localStorage.getItem('theme') || 'dark',
       sortable:null,
