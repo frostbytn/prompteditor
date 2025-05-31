@@ -26,4 +26,4 @@ Click the play button next to the token count to run your prompt through a light
 
 Open DevTools → Network and confirm that the WASM and model files return **200**.
 
-The page initially loads with a sample task that asks the model to describe what a Cedar tree looks like, so you can try it out immediately. Feel free to customize the default template and styling.
+The page initially loads with a sample task that asks the model to briefly describe what a northern Minnesotan cedar tree looks like, so you can try it out immediately. Feel free to customize the default template and styling.
