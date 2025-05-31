@@ -12,7 +12,7 @@ A lightweight client-side web app for building and previewing prompt templates f
 - Icon-based buttons for a compact interface.
 - Reorder sections via drag and drop.
 - Animated interactions with feedback when copying the rendered prompt.
-- Test prompts locally with a lightweight in-browser Llama model.
+- Test prompts locally with a lightweight in-browser Llama model executed inside a Web Worker.
 - Displays estimated token count for the rendered prompt.
 - Built-in starter templates for code assistants and document extraction.
 - Separate settings page to manage preferences.
@@ -22,7 +22,7 @@ A lightweight client-side web app for building and previewing prompt templates f
 
 Open `index.html` in a browser. No build step or server is required.
 
-Click the play button next to the token count to run your prompt through a lightweight LLaMA model powered by `llama.cpp` compiled to WebAssembly. The runtime and model are loaded at runtime from public CDNs.
+Click the play button next to the token count to run your prompt through a lightweight LLaMA model powered by `llama.cpp` compiled to WebAssembly. The runtime and model are loaded at runtime from public CDNs and the model executes inside a Web Worker.
 
 Open DevTools → Network and confirm that the WASM and model files return **200**.
 
