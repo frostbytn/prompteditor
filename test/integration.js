@@ -15,7 +15,8 @@ async function run() {
     );
     await llama.loadModelFromHF(
       'TheBloke/rocket-3B-GGUF',
-      'rocket-3b.Q4_K_M.gguf'
+      'rocket-3b.Q4_K_M.gguf',
+      { nCtx: 4096 }
     );
     let out = '';
     for await (const chunk of llama.createCompletion('Hello,', { nPredict: 1 })) {
