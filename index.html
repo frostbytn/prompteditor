@@ -332,14 +332,16 @@
         setTimeout(() => this.copied = false, 1500);
       },
       log(msg){
-        this.logs.push(`[${new Date().toLocaleTimeString()}] ${msg}`);
+        const entry = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        this.logs.push(entry);
+        try { console.debug(entry); } catch(e) {}
         this.$nextTick(() => {
           const c = this.$refs.logContainer;
           if(c) c.scrollTop = c.scrollHeight;
         });
       },
-      async ensureLlamaContext(){
-        if(this.llamaCtx) return;
+      async ensureLlamaContext(force){
+        if(this.llamaCtx && !force) return;
         this.log('Initializing WLLama context...');
         this.loadingMessage = 'Loading model...';
         try {
@@ -368,6 +370,7 @@
         }
       },
       async runPrompt(){
+        let prompt = this.rendered();
         try {
           await this.ensureLlamaContext();
           if(!this.llamaCtx){
@@ -375,19 +378,41 @@
           }
           this.loadingMessage = 'Generating...';
           this.log('Generating response...');
+          this.log('Prompt length: ' + prompt.length);
 
-          // One-shot completion without streaming
-          const responseText = await this.llamaCtx.createCompletion(
-            this.rendered(),
+          this.llmOutput = '';
+          for await (const chunk of this.llamaCtx.createCompletion(
+            prompt,
             { nPredict: 64, temp: 0.7, topK: 40 }
-          );
-
-          this.llmOutput = responseText;
+          )){
+            this.log('Chunk: ' + chunk);
+            this.llmOutput += chunk;
+          }
           this.log('Generation complete.');
         } catch(err){
           this.log('Run error: ' + err);
           if(err && err.stack){
             this.log(err.stack);
+          }
+          if(err && err.name === 'DataCloneError'){
+            this.log('DataCloneError detected - resetting context and retrying');
+            try{
+              await this.ensureLlamaContext(true);
+              this.llmOutput = '';
+              for await (const chunk of this.llamaCtx.createCompletion(
+                prompt,
+                { nPredict: 64, temp: 0.7, topK: 40 }
+              )){
+                this.log('Chunk(retry): ' + chunk);
+                this.llmOutput += chunk;
+              }
+              this.log('Generation complete after retry.');
+            }catch(err2){
+              this.log('Retry failed: ' + err2);
+              if(err2 && err2.stack){
+                this.log(err2.stack);
+              }
+            }
           }
         } finally {
           this.loadingMessage = '';
