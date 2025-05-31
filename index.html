@@ -202,7 +202,7 @@
       copied:false,
       theme: localStorage.getItem('theme') || 'dark',
       sortable:null,
-      llamaCtx:null,
+      llamaWorker:null,
       llmOutput:'',
       loadingMessage:'',
       logs:[],
@@ -341,73 +341,68 @@
         });
       },
       async ensureLlamaContext(force){
-        if(this.llamaCtx && !force) return;
-        this.log('Initializing WLLama context...');
-        this.loadingMessage = 'Loading model...';
-        try {
-          const { Wllama } = await import('https://cdn.jsdelivr.net/npm/@wllama/wllama@latest/esm/index.js');
-          const wasmURL = 'https://cdn.jsdelivr.net/npm/@wllama/wllama@latest/esm/single-thread/wllama.wasm';
-          // Stream the TheBloke 3B model directly inside the worker
-          const modelRepo = 'TheBloke/rocket-3B-GGUF';
-          const modelFile = 'rocket-3b.Q4_K_M.gguf';
-          this.log('Instantiating WASM from ' + wasmURL);
-          const llama = new Wllama(
-            { 'single-thread/wllama.wasm': wasmURL },
-            { parallelDownloads: 5, allowOffline: false }
-          );
-          this.log('Loading model from ' + modelRepo + '/' + modelFile);
-          await llama.loadModelFromHF(modelRepo, modelFile);
-          this.llamaCtx = llama;
-          this.log('Model loaded.');
-        } catch(err){
-          this.log('Context init failed: ' + err);
-          if(err && err.stack){
-            this.log(err.stack);
-          }
-          throw err;
-        } finally {
-          this.loadingMessage = '';
+        if(this.llamaWorker && !force) return;
+        if(this.llamaWorker){
+          this.llamaWorker.terminate();
+          this.llamaWorker = null;
         }
+        this.log('Initializing WLLama worker...');
+        this.loadingMessage = 'Loading model...';
+        await new Promise((resolve, reject) => {
+          const worker = new Worker('llama-worker.js', { type: 'module' });
+          this.llamaWorker = worker;
+          const onMessage = e => {
+            const d = e.data;
+            if(d.type === 'init'){
+              worker.removeEventListener('message', onMessage);
+              this.log('Model loaded.');
+              resolve();
+            } else if(d.type === 'error'){
+              worker.removeEventListener('message', onMessage);
+              this.log('Context init failed: ' + d.message);
+              if(d.stack) this.log(d.stack);
+              reject(new Error(d.message));
+            }
+          };
+          worker.addEventListener('message', onMessage);
+          worker.postMessage({action:'init'});
+        });
+        this.loadingMessage = '';
       },
       async runPrompt(){
         let prompt = this.rendered();
         try {
           await this.ensureLlamaContext();
-          if(!this.llamaCtx){
-            throw new Error('Context unavailable');
+          if(!this.llamaWorker){
+            throw new Error('Worker unavailable');
           }
           this.loadingMessage = 'Generating...';
           this.log('Generating response...');
           this.log('Prompt length: ' + prompt.length);
 
-          const responseText = await this.llamaCtx.createCompletion(
-            prompt,
-            { nPredict: 64, temp: 0.7, topK: 40 }
-          );
-
-          this.llmOutput = responseText;
-          this.log('Generation complete.');
+          await new Promise((resolve, reject) => {
+            const worker = this.llamaWorker;
+            const onMessage = e => {
+              const d = e.data;
+              if(d.type === 'result'){
+                worker.removeEventListener('message', onMessage);
+                this.llmOutput = d.text;
+                this.log('Generation complete.');
+                resolve();
+              }else if(d.type === 'error'){
+                worker.removeEventListener('message', onMessage);
+                this.log('Generation error: ' + d.message);
+                if(d.stack) this.log(d.stack);
+                reject(new Error(d.message));
+              }
+            };
+            worker.addEventListener('message', onMessage);
+            worker.postMessage({action:'generate', prompt});
+          });
         } catch(err){
           this.log('Run error: ' + err);
           if(err && err.stack){
             this.log(err.stack);
-          }
-          if(err && err.name === 'DataCloneError'){
-            this.log('DataCloneError detected - resetting context and retrying');
-            try{
-              await this.ensureLlamaContext(true);
-              const retryText = await this.llamaCtx.createCompletion(
-                prompt,
-                { nPredict: 64, temp: 0.7, topK: 40 }
-              );
-              this.llmOutput = retryText;
-              this.log('Generation complete after retry.');
-            }catch(err2){
-              this.log('Retry failed: ' + err2);
-              if(err2 && err2.stack){
-                this.log(err2.stack);
-              }
-            }
           }
         } finally {
           this.loadingMessage = '';
