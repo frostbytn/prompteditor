@@ -201,6 +201,11 @@
       showTemplateModal:false,
       copied:false,
       theme: localStorage.getItem('theme') || 'dark',
+      modelParams:{
+        nPredict: parseInt(localStorage.getItem('nPredict')) || 256,
+        temp: parseFloat(localStorage.getItem('temp')) || 0.7,
+        topK: parseInt(localStorage.getItem('topK')) || 40
+      },
       sortable:null,
       llamaWorker:null,
       llmOutput:'',
@@ -399,7 +404,7 @@
               }
             };
             worker.addEventListener('message', onMessage);
-            worker.postMessage({action:'generate', prompt});
+            worker.postMessage({action:'generate', prompt, params:this.modelParams});
           });
         } catch(err){
           this.log('Run error: ' + err);
