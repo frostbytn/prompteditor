@@ -35,7 +35,7 @@ self.addEventListener('message', async (e) => {
       log('Creating completion...');
       let out = '';
       let result = self.llama.createCompletion(prompt, {
-        nPredict: 64,
+        nPredict: 256,
         temp: 0.7,
         topK: 40
       });
